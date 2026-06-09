@@ -201,6 +201,13 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 <div><div class="form-label">Income</div><input class="form-input" type="number" id="ov-income-inp" style="padding:8px 10px;font-size:15px"></div>
           <div><div class="form-label">Savings balance</div><input class="form-input" type="number" id="ov-savings-inp" style="padding:8px 10px;font-size:15px"></div>
         </div>
+        <div style="margin-bottom:10px">
+          <div class="form-label">FX Rate · 1 SGD =</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input class="form-input" type="number" id="ov-fx-inp" style="padding:8px 10px;font-size:15px;flex:1">
+            <span style="font-family:var(--font-mono);font-size:13px;color:var(--text2);flex-shrink:0">HKD</span>
+          </div>
+        </div>
         <button class="add-btn" style="width:100%;padding:9px" onclick="saveOv()">Save</button>
       </div>
     </div>
@@ -446,6 +453,42 @@ function defaultTxs(c, mk) {
 // ── DATA ACCESS ───────────────────────────────────────────────
 function getShared(c) { return cacheGet('shared_'+c, defaultShared(c)); }
 function saveShared(c, d) { cacheSet('shared_'+c, d); pushToSheets('shared_'+c, d); }
+function getFxRate() { return cacheGet('fx_rate', 6); } // 1 SGD = N HKD
+function saveFxRate(r) { cacheSet('fx_rate', r); pushToSheets('fx_rate', r); }
+// Convert amount to SGD
+function toSGD(amount, fromCurr) { return fromCurr === 'SGD' ? amount : amount / getFxRate(); }
+// Convert amount to viewing currency
+function toViewCurr(amount, fromCurr) {
+  if (fromCurr === curr) return amount;
+  if (curr === 'SGD') return amount / getFxRate();   // HKD → SGD
+  return amount * getFxRate();                        // SGD → HKD
+}
+// Get combined categories from both currencies, amounts converted to curr
+function getCombinedCategories(mk) {
+  var map = {}; // keyed by name, merged across currencies
+  ['SGD','HKD'].forEach(function(c) {
+    var shared = getShared(c);
+    var txs = getTxs(c, mk);
+    computeSpent(shared.categories, txs);
+    shared.categories.forEach(function(cat) {
+      var name = cat.name;
+      var budgetConverted = toViewCurr(cat.budget, c);
+      var amountConverted = toViewCurr(cat.amount, c);
+      if (map[name]) {
+        map[name].budget += budgetConverted;
+        map[name].amount += amountConverted;
+      } else {
+        map[name] = {
+          name: name,
+          color: cat.color,
+          budget: budgetConverted,
+          amount: amountConverted
+        };
+      }
+    });
+  });
+  return Object.keys(map).map(function(k) { return map[k]; });
+}
 function mk(y, m) { return y+'-'+(m<10?'0':'')+m; }
 function curMk() { return mk(viewMonth.year, viewMonth.month); }
 function getTxs(c, k) { return cacheGet('txs_'+c+'_'+k, defaultTxs(c, k)); }
@@ -466,6 +509,7 @@ function totalCatBudget(shared) {
 
 // ── STATE ─────────────────────────────────────────────────────
 var curr = 'SGD';
+// FX: 1 SGD = N HKD (user-editable)
 var entryType = 'expense';
 var donutChart = null;
 var txOpen = false;
@@ -645,20 +689,20 @@ function updateFilterSummary(filtered) {
 // ── RENDER ────────────────────────────────────────────────────
 function render() {
   updateTopbarLabel();
-  var shared = getShared(curr);
   var key = curMk();
-  var txs = getTxs(curr, key);
-  computeSpent(shared.categories, txs);
-  var spent = shared.categories.reduce(function(s,c) { return s+c.amount; }, 0);
-  var totalBudget = totalCatBudget(shared);
+  // Combined across both currencies for overview
+  var combined = getCombinedCategories(key);
+  var totalBudget = combined.reduce(function(s,c) { return s+c.budget; }, 0);
+  var spent = combined.reduce(function(s,c) { return s+c.amount; }, 0);
   var remaining = totalBudget - spent;
   var usedPct = totalBudget > 0 ? (spent/totalBudget*100) : 0;
 
   var remEl = document.getElementById('ov-remaining');
   remEl.textContent = fmtD(remaining);
   remEl.className = 'ov-val '+(remaining<0?'red':remaining<totalBudget*.15?'amber':'green');
+  var shared = getShared(curr);
   document.getElementById('ov-savings-disp').textContent = fmt(shared.savingsBalance||0);
-  document.getElementById('ov-curr-sub').textContent = curr+' remaining';
+  document.getElementById('ov-curr-sub').textContent = curr+' remaining (combined)';
   document.getElementById('ov-savings-sub').textContent = curr+' balance';
 
   var bar = document.getElementById('ov-bar');
@@ -667,15 +711,15 @@ function render() {
   document.getElementById('ov-pct').textContent = usedPct.toFixed(1)+'% used';
   document.getElementById('ov-budget-total').textContent = '/ '+curr+' '+fmt(totalBudget);
 
-  renderDonut(shared, spent);
+  renderDonut(combined, spent);
   renderSavings(shared);
-  renderCats(shared, spent);
+  renderCats(shared, key); // per-currency categories card
   if (txOpen) renderTxList();
 }
 
 // ── DONUT ─────────────────────────────────────────────────────
-function renderDonut(shared, spent) {
-  document.getElementById('donut-leg').innerHTML = shared.categories.map(function(c) {
+function renderDonut(combined, spent) {
+  document.getElementById('donut-leg').innerHTML = combined.map(function(c) {
     var pct = spent > 0 ? (c.amount/spent*100).toFixed(0) : 0;
     return '<div class="leg-item"><div class="leg-dot" style="background:'+c.color+'"></div>'+c.name+' '+pct+'%</div>';
   }).join('');
@@ -683,10 +727,10 @@ function renderDonut(shared, spent) {
   donutChart = new Chart(document.getElementById('donutChart'), {
     type:'doughnut',
     data:{
-      labels: shared.categories.map(function(c) { return c.name; }),
+      labels: combined.map(function(c) { return c.name; }),
       datasets:[{
-        data: shared.categories.map(function(c) { return c.amount||0; }),
-        backgroundColor: shared.categories.map(function(c) { return c.color; }),
+        data: combined.map(function(c) { return c.amount||0; }),
+        backgroundColor: combined.map(function(c) { return c.color; }),
         borderWidth:3, borderColor:'#faf7f2', hoverBorderColor:'#faf7f2'
       }]
     },
@@ -730,7 +774,10 @@ function renderSavings(shared) {
 }
 
 // ── CATEGORIES ────────────────────────────────────────────────
-function renderCats(shared, spent) {
+function renderCats(shared, mk) {
+  var txs = getTxs(curr, mk);
+  computeSpent(shared.categories, txs);
+  var spent = shared.categories.reduce(function(s,c) { return s+c.amount; }, 0);
   document.getElementById('cat-list').innerHTML = shared.categories.map(function(c, i) {
     var pct = spent>0 ? (c.amount/spent*100) : 0;
     var over = c.amount > c.budget && c.budget > 0;
@@ -879,14 +926,17 @@ function toggleOvEdit() {
     var s = getShared(curr);
     document.getElementById('ov-income-inp').value = s.income;
     document.getElementById('ov-savings-inp').value = s.savingsBalance||0;
+    document.getElementById('ov-fx-inp').value = getFxRate();
   }
 }
 function saveOv() {
   var s = getShared(curr);
   var inc = parseFloat(document.getElementById('ov-income-inp').value);
   var sav = parseFloat(document.getElementById('ov-savings-inp').value);
+  var fx  = parseFloat(document.getElementById('ov-fx-inp').value);
   if (!isNaN(inc)) s.income = inc;
   if (!isNaN(sav)) s.savingsBalance = sav;
+  if (!isNaN(fx) && fx > 0) saveFxRate(fx);
   saveShared(curr, s);
   toggleOvEdit();
   render();
