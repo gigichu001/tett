@@ -444,7 +444,10 @@ function renderSavings(d) {
     <div class="sav-row">
       <div class="sav-hdr">
         <div><div class="sav-title">This month</div><div class="sav-period">${curr} · Jun 2026</div></div>
-        <div class="sav-nums"><div style="font-size:15px;font-weight:500;color:var(--text)">${fmt(s.monthActual)}</div><div style="margin-top:2px">target ${fmt(s.monthTarget)}</div></div>
+        <div class="sav-nums">
+          <input class="inline-inp" type="number" value="${s.monthActual}" style="width:90px;font-size:15px" onchange="DATA['${curr}'].savings.monthActual=parseFloat(this.value)||0;renderSavings(DATA['${curr}'])">
+          <div style="margin-top:4px;font-size:11px;color:var(--text3)">target <input class="inline-inp" type="number" value="${s.monthTarget}" style="width:80px;font-size:11px" onchange="DATA['${curr}'].savings.monthTarget=parseFloat(this.value)||0;renderSavings(DATA['${curr}'])"></div>
+        </div>
       </div>
       <div class="prog-track"><div class="prog-fill" style="width:${mPct}%;background:${col(mPct)}"></div></div>
       <div class="sav-pct-lbl">${mPct}% of monthly target</div>
@@ -452,7 +455,10 @@ function renderSavings(d) {
     <div class="sav-row">
       <div class="sav-hdr">
         <div><div class="sav-title">This year</div><div class="sav-period">${curr} · 2026</div></div>
-        <div class="sav-nums"><div style="font-size:15px;font-weight:500;color:var(--text)">${fmt(s.yearActual)}</div><div style="margin-top:2px">target ${fmt(s.yearTarget)}</div></div>
+        <div class="sav-nums">
+          <input class="inline-inp" type="number" value="${s.yearActual}" style="width:90px;font-size:15px" onchange="DATA['${curr}'].savings.yearActual=parseFloat(this.value)||0;renderSavings(DATA['${curr}'])">
+          <div style="margin-top:4px;font-size:11px;color:var(--text3)">target <input class="inline-inp" type="number" value="${s.yearTarget}" style="width:80px;font-size:11px" onchange="DATA['${curr}'].savings.yearTarget=parseFloat(this.value)||0;renderSavings(DATA['${curr}'])"></div>
+        </div>
       </div>
       <div class="prog-track"><div class="prog-fill" style="width:${yPct}%;background:${col(yPct)}"></div></div>
       <div class="sav-pct-lbl">${yPct}% of yearly target</div>
