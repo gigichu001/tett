@@ -12,60 +12,61 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
-  --bg:#f5f0e8;--bg2:#ede7d9;--bg3:#e4dccb;
-  --surface:#faf7f2;--surface2:#f0ebe0;
-  --border:rgba(100,80,50,0.12);--border2:rgba(100,80,50,0.22);
-  --text:#2c2416;--text2:#6b5c42;--text3:#a8947a;
-  --accent:#7c5c38;--accent2:#b08050;
-  --green:#3a7d5e;--amber:#c07820;--red:#b84040;
-  --r:14px;--r-sm:9px;
-  --font-mono:'DM Mono',monospace;--font-head:'Lora',serif;--font-body:'DM Sans',sans-serif;
+  --bg:#f5f0e8; --bg2:#ede7d9; --bg3:#e4dccb;
+  --surface:#faf7f2; --surface2:#f0ebe0;
+  --border:rgba(100,80,50,0.12); --border2:rgba(100,80,50,0.22);
+  --text:#2c2416; --text2:#6b5c42; --text3:#a8947a;
+  --accent:#7c5c38; --accent2:#b08050;
+  --green:#3a7d5e; --amber:#c07820; --red:#b84040;
+  --r:14px; --r-sm:9px;
+  --font-mono:'DM Mono',monospace;
+  --font-head:'Lora',serif;
+  --font-body:'DM Sans',sans-serif;
   --shadow:0 1px 4px rgba(100,80,50,0.10);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;padding-bottom:110px}
-.topbar{position:sticky;top:0;z-index:100;background:rgba(245,240,232,0.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:52px 20px 14px;border-bottom:0.5px solid var(--border2)}
-.topbar-row1{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px}
-.topbar-sub{font-family:var(--font-mono);font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+
+.topbar{position:sticky;top:0;z-index:100;background:rgba(245,240,232,0.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:52px 20px 14px;display:flex;justify-content:space-between;align-items:flex-end;border-bottom:0.5px solid var(--border2)}
 .topbar-month{font-family:var(--font-head);font-size:22px;font-weight:600;color:var(--text)}
+.topbar-sub{font-family:var(--font-mono);font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
 .curr-toggle{display:flex;background:var(--bg3);border-radius:99px;padding:3px;gap:2px}
 .curr-btn{font-family:var(--font-mono);font-size:12px;padding:5px 14px;border-radius:99px;border:none;background:transparent;color:var(--text3);cursor:pointer;transition:all .2s}
 .curr-btn.active{background:var(--accent);color:#fff}
-.month-nav{display:flex;align-items:center;background:var(--bg2);border-radius:var(--r-sm);overflow:hidden}
-.mnav-btn{background:none;border:none;color:var(--text3);font-size:18px;padding:7px 14px;cursor:pointer;flex-shrink:0}
-.mnav-label{flex:1;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--text2);letter-spacing:.06em;cursor:pointer;padding:8px 0;user-select:none}
-.mpicker-wrap{position:relative}
-.mpicker-drop{display:none;position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r);box-shadow:0 8px 32px rgba(100,80,50,.18);z-index:200;padding:12px;min-width:260px}
-.mpicker-drop.open{display:block}
-.mpicker-year-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.mpicker-year{font-family:var(--font-mono);font-size:14px;font-weight:500;color:var(--text)}
-.mpicker-ybtn{background:none;border:0.5px solid var(--border2);color:var(--text3);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:14px}
-.mpicker-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
-.mpicker-m{background:none;border:none;border-radius:6px;padding:8px 4px;font-family:var(--font-mono);font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s}
-.mpicker-m:hover{background:var(--bg3)}
-.mpicker-m.active{background:var(--accent);color:#fff}
+
 .scroll{padding:18px 16px 0}
 .card{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r);padding:18px;margin-bottom:12px;box-shadow:var(--shadow)}
 .card-label{font-family:var(--font-mono);font-size:11px;color:var(--text3);letter-spacing:.09em;text-transform:uppercase;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+
+/* OVERVIEW */
 .ov-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .ov-item{background:var(--surface2);border-radius:var(--r-sm);padding:14px;border:0.5px solid var(--border)}
 .ov-lbl{font-family:var(--font-mono);font-size:11px;color:var(--text3);letter-spacing:.06em;margin-bottom:6px}
 .ov-val{font-family:var(--font-mono);font-size:24px;font-weight:500;letter-spacing:-.02em;line-height:1}
 .ov-sub{font-size:11px;color:var(--text3);margin-top:4px}
-.ov-val.green{color:var(--green)}.ov-val.amber{color:var(--amber)}.ov-val.red{color:var(--red)}
+.ov-val.green{color:var(--green)} .ov-val.amber{color:var(--amber)} .ov-val.red{color:var(--red)}
+
 .prog-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px}
 .prog-pct{font-family:var(--font-mono);font-size:13px;font-weight:500}
 .prog-track{height:6px;background:var(--bg3);border-radius:99px;overflow:hidden}
 .prog-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* EDIT BTN */
 .edit-btn{font-family:var(--font-mono);font-size:11px;color:var(--text3);background:none;border:0.5px solid var(--border2);border-radius:99px;padding:3px 10px;cursor:pointer;letter-spacing:.05em;transition:all .2s;flex-shrink:0}
 .edit-btn.on{color:var(--accent);border-color:var(--accent);background:rgba(124,92,56,.06)}
+
+/* TABS */
 .tabs{display:flex;gap:4px;background:var(--bg2);border-radius:var(--r-sm);padding:3px;margin-bottom:14px}
 .tab{flex:1;font-family:var(--font-body);font-size:13px;padding:7px 0;border-radius:6px;border:none;background:transparent;color:var(--text3);cursor:pointer;transition:all .2s}
 .tab.active{background:var(--surface);color:var(--text);font-weight:500;border:0.5px solid var(--border2)}
+
+/* LEGEND */
 .leg{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 .leg-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)}
 .leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .chart-wrap{position:relative;width:100%}
+
+/* CATEGORY LIST */
 .cat-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:0.5px solid var(--border)}
 .cat-row:last-child{border-bottom:none}
 .cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
@@ -77,49 +78,36 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .cat-amount{font-family:var(--font-mono);font-size:14px;font-weight:500;min-width:62px;text-align:right}
 .del-btn{background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0;display:none}
 .edit-mode .del-btn{display:block}
-.pen-btn{background:none;border:none;color:var(--accent2);font-size:15px;cursor:pointer;padding:0 3px;line-height:1;flex-shrink:0}
+
+/* INLINE EDIT INPUTS */
 .inline-inp{background:var(--bg2);border:0.5px solid var(--border2);border-radius:6px;padding:4px 6px;font-family:var(--font-mono);font-size:13px;color:var(--text);outline:none;width:72px;text-align:right}
 .inline-inp:focus{border-color:var(--accent2)}
 .inline-text-inp{background:var(--bg2);border:0.5px solid var(--border2);border-radius:6px;padding:4px 6px;font-family:var(--font-body);font-size:13px;color:var(--text);outline:none;flex:1;min-width:60px}
 .inline-text-inp:focus{border-color:var(--accent2)}
+
+/* ADD ROW */
+.add-row{display:none;flex-wrap:wrap;gap:6px;padding:10px 0;border-top:0.5px solid var(--border)}
+.add-row.show{display:flex}
+.add-inp{background:var(--bg2);border:0.5px solid var(--border2);border-radius:6px;padding:7px 9px;font-family:var(--font-body);font-size:13px;color:var(--text);outline:none;flex:1;min-width:60px}
+.add-inp:focus{border-color:var(--accent2)}
+.add-sel{background:var(--bg2);border:0.5px solid var(--border2);border-radius:6px;padding:7px 9px;font-family:var(--font-body);font-size:13px;color:var(--text);outline:none;cursor:pointer}
+.add-btn{background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:13px;padding:7px 14px;cursor:pointer;font-family:var(--font-body);white-space:nowrap}
+
+/* SAVINGS */
 .sav-row{padding:12px 0;border-bottom:0.5px solid var(--border)}
 .sav-row:last-child{border-bottom:none}
 .sav-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
 .sav-title{font-size:14px;color:var(--text);font-weight:500}
 .sav-period{font-size:11px;color:var(--text3);margin-top:2px}
 .sav-nums{font-family:var(--font-mono);font-size:12px;color:var(--text2);text-align:right}
-.tx-hdr{display:flex;justify-content:space-between;align-items:center}
-.tx-hdr-left{font-family:var(--font-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);cursor:pointer;display:flex;align-items:center;gap:6px}
+.sav-pct-lbl{font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-top:4px;text-align:right}
+
+/* HISTORY */
+.tx-hdr-btn{width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:none;color:var(--text2);cursor:pointer;padding:0;font-family:var(--font-body);font-size:13px}
 .tx-icon{font-size:16px;color:var(--text3);transition:transform .3s;display:inline-block}
 .tx-icon.open{transform:rotate(180deg)}
-/* SORT BAR */
-.sort-bar{display:none;gap:4px;padding:10px 0 0;flex-wrap:wrap}
-.sort-bar.show{display:flex}
-.sort-chip{font-family:var(--font-mono);font-size:11px;padding:5px 10px;border-radius:99px;border:0.5px solid var(--border2);background:none;color:var(--text3);cursor:pointer;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:3px}
-.sort-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.sort-chip .arrow{font-size:9px;opacity:.7}
-/* FILTER PANEL */
-.filter-bar{display:none;padding:12px 0 4px;border-top:0.5px solid var(--border);margin-top:8px}
-.filter-bar.show{display:block}
-.filter-sec-lbl{font-family:var(--font-mono);font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
-.filter-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
-.filter-chip{font-family:var(--font-mono);font-size:11px;padding:5px 11px;border-radius:99px;border:0.5px solid var(--border2);background:none;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap}
-.filter-chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
-.filter-date-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
-.filter-date-inp{background:var(--surface2);border:0.5px solid var(--border2);border-radius:6px;padding:6px 8px;font-family:var(--font-mono);font-size:11px;color:var(--text);outline:none;flex:1;-webkit-appearance:none;appearance:none;min-width:0}
-.filter-date-inp:focus{border-color:var(--accent2)}
-.filter-date-sep{font-family:var(--font-mono);font-size:11px;color:var(--text3);flex-shrink:0}
-.filter-clear-btn{font-family:var(--font-mono);font-size:11px;color:var(--text3);background:none;border:0.5px solid var(--border2);border-radius:99px;padding:5px 11px;cursor:pointer;white-space:nowrap;flex-shrink:0}
-/* FILTER SUMMARY */
-.filter-summary{display:none;background:var(--bg2);border-radius:var(--r-sm);padding:10px 14px;margin-top:6px;border:0.5px solid var(--border)}
-.filter-summary.show{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.fs-left{min-width:0}
-.fs-label{font-family:var(--font-mono);font-size:11px;color:var(--text2);font-weight:500}
-.fs-sub{font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fs-total{font-family:var(--font-mono);font-size:17px;font-weight:500;color:var(--text);flex-shrink:0}
-/* TX LIST */
 .tx-list{overflow:hidden;max-height:0;transition:max-height .35s cubic-bezier(.4,0,.2,1)}
-.tx-list.open{max-height:3000px;overflow-y:auto}
+.tx-list.open{max-height:800px;overflow-y:auto}
 .tx-row{display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-top:0.5px solid var(--border)}
 .tx-date{font-family:var(--font-mono);font-size:11px;color:var(--text3);min-width:44px;padding-top:2px}
 .tx-info{flex:1}
@@ -128,7 +116,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .tx-right{display:flex;align-items:center;gap:6px}
 .tx-amount{font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--red);white-space:nowrap}
 .tx-amount.inc{color:var(--green)}
-/* FORM */
+
+/* FORM FIELDS */
 .form-group{margin-bottom:12px}
 .form-label{font-family:var(--font-mono);font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:5px}
 .form-input,.form-select{width:100%;background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);padding:12px 14px;color:var(--text);font-size:16px;font-family:var(--font-body);outline:none;-webkit-appearance:none;appearance:none}
@@ -139,56 +128,45 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .type-btn.inc{background:rgba(58,125,94,.1);color:var(--green);border-color:rgba(58,125,94,.25)}
 .submit-btn{width:100%;padding:15px;background:var(--accent);border:none;border-radius:var(--r-sm);color:#fff;font-size:16px;font-weight:600;font-family:var(--font-body);cursor:pointer;margin-top:6px}
 .submit-btn:active{opacity:.85}
-.edit-panel{background:var(--bg2);border-radius:var(--r-sm);padding:14px;margin-bottom:12px;border:0.5px solid var(--border)}
-.ep-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.add-btn{background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:13px;padding:7px 14px;cursor:pointer;font-family:var(--font-body);white-space:nowrap}
-.add-cat-row{display:none;flex-wrap:wrap;gap:6px;padding:10px 0;border-top:0.5px solid var(--border)}
-.add-cat-row.show{display:flex}
-.add-inp{background:var(--bg2);border:0.5px solid var(--border2);border-radius:6px;padding:7px 9px;font-family:var(--font-body);font-size:13px;color:var(--text);outline:none;flex:1;min-width:60px}
-.add-inp:focus{border-color:var(--accent2)}
+
+/* FAB */
 .fab{position:fixed;bottom:28px;right:20px;width:56px;height:56px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(124,92,56,.35);z-index:200;transition:transform .15s}
 .fab:active{transform:scale(.93)}
+
+/* SHEET */
 .backdrop{display:none;position:fixed;inset:0;background:rgba(44,36,22,.45);backdrop-filter:blur(4px);z-index:300}
 .backdrop.open{display:block}
 .sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:430px;background:var(--surface);border-radius:20px 20px 0 0;border-top:1px solid var(--border2);padding:16px 20px 48px;z-index:400;transition:transform .35s cubic-bezier(.32,.72,0,1)}
 .sheet.open{transform:translateX(-50%) translateY(0)}
 .sheet-handle{width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 18px}
 .sheet-title{font-family:var(--font-head);font-size:18px;font-weight:600;margin-bottom:18px;color:var(--text)}
+
+/* TOAST */
 .toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-12px);background:var(--surface);border:0.5px solid var(--green);color:var(--green);font-family:var(--font-mono);font-size:13px;padding:10px 20px;border-radius:99px;opacity:0;transition:all .3s;z-index:500;white-space:nowrap;box-shadow:var(--shadow)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* EDIT FORM PANEL */
+.edit-panel{background:var(--bg2);border-radius:var(--r-sm);padding:14px;margin-bottom:12px;border:0.5px solid var(--border)}
+.ep-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
 </style>
 </head>
 <body>
+
 <div class="toast" id="toast"></div>
+
 <div class="topbar">
-  <div class="topbar-row1">
-    <div>
-      <div class="topbar-sub">Finance <span id="sync-status" style="font-size:10px;opacity:.7;margin-left:4px"></span></div>
-      <div class="topbar-month" id="topbar-month-label">—</div>
-    </div>
-    <div class="curr-toggle">
-      <button class="curr-btn active" onclick="setCurrency('SGD')">SGD</button>
-      <button class="curr-btn" onclick="setCurrency('HKD')">HKD</button>
-    </div>
+  <div>
+    <div class="topbar-sub">Finance</div>
+    <div class="topbar-month">June 2026</div>
   </div>
-  <div class="mpicker-wrap" id="mpicker-wrap">
-    <div class="month-nav">
-      <button class="mnav-btn" onclick="shiftMonth(-1)">&#8249;</button>
-      <div class="mnav-label" onclick="togglePicker()"><span id="mnav-label-txt">Jun 2026</span> &#9660;</div>
-      <button class="mnav-btn" onclick="shiftMonth(1)">&#8250;</button>
-    </div>
-    <div class="mpicker-drop" id="mpicker-drop">
-      <div class="mpicker-year-row">
-        <button class="mpicker-ybtn" onclick="pickerYear(-1)">&#8249;</button>
-        <div class="mpicker-year" id="picker-year-lbl">2026</div>
-        <button class="mpicker-ybtn" onclick="pickerYear(1)">&#8250;</button>
-      </div>
-      <div class="mpicker-grid" id="picker-month-grid"></div>
-    </div>
+  <div class="curr-toggle">
+    <button class="curr-btn active" onclick="setCurrency('SGD')">SGD</button>
+    <button class="curr-btn" onclick="setCurrency('HKD')">HKD</button>
   </div>
 </div>
 
 <div class="scroll">
+
   <!-- OVERVIEW -->
   <div class="card">
     <div class="card-label">
@@ -198,15 +176,9 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
     <div id="ov-edit-panel" style="display:none">
       <div class="edit-panel">
         <div class="ep-grid">
-<div><div class="form-label">Income</div><input class="form-input" type="number" id="ov-income-inp" style="padding:8px 10px;font-size:15px"></div>
+          <div><div class="form-label">Budget</div><input class="form-input" type="number" id="ov-budget-inp" style="padding:8px 10px;font-size:15px"></div>
+          <div><div class="form-label">Income</div><input class="form-input" type="number" id="ov-income-inp" style="padding:8px 10px;font-size:15px"></div>
           <div><div class="form-label">Savings balance</div><input class="form-input" type="number" id="ov-savings-inp" style="padding:8px 10px;font-size:15px"></div>
-        </div>
-        <div style="margin-bottom:10px">
-          <div class="form-label">FX Rate · 1 SGD =</div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <input class="form-input" type="number" id="ov-fx-inp" style="padding:8px 10px;font-size:15px;flex:1">
-            <span style="font-family:var(--font-mono);font-size:13px;color:var(--text2);flex-shrink:0">HKD</span>
-          </div>
         </div>
         <button class="add-btn" style="width:100%;padding:9px" onclick="saveOv()">Save</button>
       </div>
@@ -215,15 +187,18 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
       <div class="ov-item">
         <div class="ov-lbl">Remaining</div>
         <div class="ov-val green" id="ov-remaining">—</div>
-        <div class="ov-sub" id="ov-curr-sub">SGD remaining</div>
+        <div class="ov-sub" id="ov-curr-sub">SGD</div>
       </div>
       <div class="ov-item">
-        <div class="ov-lbl">Savings</div>
+        <div class="ov-lbl">Current</div>
         <div class="ov-val" id="ov-savings-disp">—</div>
-        <div class="ov-sub" id="ov-savings-sub">SGD balance</div>
+        <div class="ov-sub" id="ov-savings-sub">SGD savings</div>
       </div>
     </div>
-    <div class="prog-row"><span>Budget used <span id="ov-budget-total" style="color:var(--text3)"></span></span><span class="prog-pct" id="ov-pct">—</span></div>
+    <div class="prog-row">
+      <span id="ov-prog-lbl">Budget used</span>
+      <span class="prog-pct" id="ov-pct">—</span>
+    </div>
     <div class="prog-track"><div class="prog-fill" id="ov-bar" style="width:0%"></div></div>
   </div>
 
@@ -235,7 +210,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
     </div>
     <div id="tab-donut">
       <div class="leg" id="donut-leg"></div>
-      <div class="chart-wrap" style="height:200px"><canvas id="donutChart"></canvas></div>
+      <div class="chart-wrap" style="height:200px"><canvas id="donutChart" role="img" aria-label="Spending by category"></canvas></div>
     </div>
     <div id="tab-savings" style="display:none">
       <div id="sav-list"></div>
@@ -253,51 +228,34 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
       <button class="edit-btn" id="cat-btn" onclick="toggleCatEdit()">edit</button>
     </div>
     <div id="cat-list"></div>
-    <div class="add-cat-row" id="cat-add-row">
+    <div class="add-row" id="cat-add-row">
       <input class="add-inp" type="text" id="cat-new-name" placeholder="Name">
-      <input class="add-inp" type="number" id="cat-new-bgt" placeholder="Budget" style="max-width:90px">
+      <input class="add-inp" type="number" id="cat-new-amt" placeholder="Spent" style="max-width:80px">
+      <input class="add-inp" type="number" id="cat-new-bgt" placeholder="Budget" style="max-width:80px">
       <button class="add-btn" onclick="addCat()">Add</button>
     </div>
   </div>
 
   <!-- HISTORY -->
   <div class="card" id="tx-card">
-    <div class="tx-hdr">
-      <div class="tx-hdr-left" onclick="toggleTx()">
-        <span>History</span>
-        <span class="tx-icon" id="tx-icon">&#9662;</span>
-      </div>
-      <button class="edit-btn" id="tx-edit-btn" onclick="toggleTxEdit()">edit</button>
-    </div>
-    <div class="sort-bar" id="sort-bar">
-      <button class="sort-chip active" id="sort-date" onclick="setSort('date')">Date <span class="arrow" id="arr-date">&#8595;</span></button>
-      <button class="sort-chip" id="sort-amt" onclick="setSort('amt')">Amount <span class="arrow" id="arr-amt">&#8595;</span></button>
-      <button class="sort-chip" id="filter-toggle-btn" onclick="toggleFilter()">&#9783; Filter</button>
-      <button class="sort-chip" id="cat-edit-inline-btn" onclick="toggleCatSheet()">&#9998; Cats</button>
-    </div>
-    <div class="filter-bar" id="filter-bar">
-      <div class="filter-sec-lbl">Category</div>
-      <div class="filter-chips" id="filter-cat-chips"></div>
-      <div class="filter-sec-lbl">Date range</div>
-      <div class="filter-date-row">
-        <input class="filter-date-inp" type="date" id="filter-date-from" onchange="applyFilter()">
-        <span class="filter-date-sep">&#8594;</span>
-        <input class="filter-date-inp" type="date" id="filter-date-to" onchange="applyFilter()">
-        <button class="filter-clear-btn" onclick="clearFilter()">Clear</button>
-      </div>
-    </div>
-    <div class="filter-summary" id="filter-summary">
-      <div class="fs-left">
-        <div class="fs-label" id="fs-label">0 items</div>
-        <div class="fs-sub" id="fs-sub"></div>
-      </div>
-      <div class="fs-total" id="fs-total"></div>
-    </div>
+    <button class="tx-hdr-btn" onclick="toggleTx()">
+      <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--text3)">History</span>
+      <span class="tx-icon" id="tx-icon">▾</span>
+    </button>
     <div class="tx-list" id="tx-list"></div>
+    <div class="add-row" id="tx-add-row">
+      <input class="add-inp" type="number" id="tx-new-amt" placeholder="Amount" style="max-width:90px">
+      <select class="add-sel" id="tx-new-cat"></select>
+      <input class="add-inp" type="text" id="tx-new-rmk" placeholder="Remark">
+      <input class="add-inp" type="date" id="tx-new-date" style="max-width:130px">
+      <button class="add-btn" onclick="addTx()">Add</button>
+    </div>
   </div>
+
 </div>
 
 <button class="fab" onclick="openSheet()">+</button>
+
 <div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet">
   <div class="sheet-handle"></div>
@@ -330,407 +288,138 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 </div>
 
 <script>
-// ── GOOGLE SHEETS CONFIG ──────────────────────────────────────
-// STEP 1: Paste your Apps Script Web App URL here after deploying
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMIPX7IUdErriKJJk6MwG-Q0Z_dhqVR9zGBaFMnIEX-inK7iZ14rzUY-RSpjSLFO5k/exec';
-
-// ── STORAGE LAYER (Google Sheets + localStorage cache) ────────
-// Strategy: write-through cache
-//   - Reads: try cache first, then fetch from Sheets
-//   - Writes: write to cache immediately + async push to Sheets
-var LS = 'fin2_';
-var _cache = {};
-
-function lsGet(k, fb) {
-  try { var v = localStorage.getItem(LS+k); return v !== null ? JSON.parse(v) : fb; } catch(e) { return fb; }
-}
-function lsSet(k, v) {
-  try { localStorage.setItem(LS+k, JSON.stringify(v)); } catch(e) {}
-}
-function cacheGet(k, fb) {
-  if (_cache[k] !== undefined) return _cache[k];
-  var v = lsGet(k, null);
-  if (v !== null) { _cache[k] = v; return v; }
-  return fb;
-}
-function cacheSet(k, v) {
-  _cache[k] = v;
-  lsSet(k, v);
-}
-
-// Push a single key-value to Sheets (fire and forget)
-function pushToSheets(k, v) {
-  if (!SCRIPT_URL) return;
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({action:'set', key:k, value:JSON.stringify(v)})
-  }).catch(function() {});
-}
-
-// Pull all data from Sheets into cache (called on init)
-function pullFromSheets(cb) {
-  if (!SCRIPT_URL) { cb(); return; }
-  showSyncStatus('syncing…');
-  fetch(SCRIPT_URL + '?action=getAll')
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (data && data.rows) {
-        data.rows.forEach(function(row) {
-          if (row.key && row.value) {
-            try {
-              var parsed = JSON.parse(row.value);
-              _cache[row.key] = parsed;
-              lsSet(row.key.replace(/^fin2_/,''), parsed);
-            } catch(e) {}
-          }
-        });
-      }
-      showSyncStatus('synced ✓', true);
-      cb();
-    })
-    .catch(function() {
-      showSyncStatus('offline — local', false, true);
-      cb();
-    });
-}
-
-function showSyncStatus(msg, ok, warn) {
-  var el = document.getElementById('sync-status');
-  if (!el) return;
-  el.textContent = msg;
-  el.style.color = ok ? 'var(--green)' : warn ? 'var(--amber)' : 'var(--text3)';
-}
-
-// ── DEFAULT DATA ──────────────────────────────────────────────
-function defaultShared(c) {
-  if (c === 'SGD') return {
-    budget:4178, income:4662.27, savingsBalance:4662,
-    savings:{monthTarget:800,monthActual:400,yearTarget:8000,yearActual:2600},
-    categories:[
-      {name:'Living',     budget:1450, color:'#3a7d5e'},
-      {name:'Loans',      budget:528,  color:'#b84040'},
-      {name:'Eat out',    budget:300,  color:'#3a5c8a'},
-      {name:'Leisure',    budget:100,  color:'#6b5090'},
-      {name:'Transport',  budget:80,   color:'#c07820'},
-      {name:'Grocery',    budget:400,  color:'#7c5c38'},
-      {name:'Consumption',budget:50,   color:'#a04060'}
+// ── DATA ──────────────────────────────────────────────────────
+// SGD and HKD are fully independent. Spending in one never affects the other.
+const DATA = {
+  SGD: {
+    budget: 4178, income: 4662.27,
+    categories: [
+      {name:'Living',     amount:1400,  budget:1450, color:'#3a7d5e'},
+      {name:'Loans',      amount:528,   budget:528,  color:'#b84040'},
+      {name:'Eat out',    amount:53.5,  budget:300,  color:'#3a5c8a'},
+      {name:'Leisure',    amount:89,    budget:100,  color:'#6b5090'},
+      {name:'Transport',  amount:80,    budget:80,   color:'#c07820'},
+      {name:'Grocery',    amount:104.8, budget:400,  color:'#7c5c38'},
+      {name:'Consumption',amount:7.6,   budget:50,   color:'#a04060'},
+    ],
+    savingsBalance: 4662,
+    savings: {monthTarget:800, monthActual:400, yearTarget:8000, yearActual:2600},
+    txs: [
+      {date:'06/03',amount:12.8, category:'Eat out',    remark:'lunch',        type:'expense'},
+      {date:'06/02',amount:89,   category:'Leisure',    remark:'hle clothesx2',type:'expense'},
+      {date:'06/02',amount:7.6,  category:'Consumption',remark:'food scale',   type:'expense'},
+      {date:'06/02',amount:104.8,category:'Grocery',    remark:'donki',        type:'expense'},
+      {date:'06/15',amount:1400, category:'Living',     remark:'rent',         type:'expense'},
+      {date:'06/02',amount:528,  category:'Loans',      remark:'just need',    type:'expense'},
+      {date:'06/02',amount:80,   category:'Transport',  remark:'just need',    type:'expense'},
+      {date:'06/02',amount:10.7, category:'Eat out',    remark:'donki',        type:'expense'},
+      {date:'06/01',amount:30.7, category:'Eat out',    remark:'sushiro',      type:'expense'},
     ]
-  };
-  return {
-    budget:32000, income:49668, savingsBalance:49668,
-    savings:{monthTarget:6000,monthActual:3000,yearTarget:60000,yearActual:18000},
-    categories:[
-      {name:'Living',   budget:9000, color:'#3a7d5e'},
-      {name:'Loans',    budget:4100, color:'#b84040'},
-      {name:'Eat out',  budget:2000, color:'#3a5c8a'},
-      {name:'Leisure',  budget:1500, color:'#6b5090'},
-      {name:'Transport',budget:800,  color:'#c07820'},
-      {name:'Grocery',  budget:2000, color:'#7c5c38'}
+  },
+  HKD: {
+    budget: 32000, income: 49668,
+    categories: [
+      {name:'Living',   amount:8000, budget:9000, color:'#3a7d5e'},
+      {name:'Loans',    amount:4100, budget:4100, color:'#b84040'},
+      {name:'Eat out',  amount:1800, budget:2000, color:'#3a5c8a'},
+      {name:'Leisure',  amount:1200, budget:1500, color:'#6b5090'},
+      {name:'Transport',amount:700,  budget:800,  color:'#c07820'},
+      {name:'Grocery',  amount:1000, budget:2000, color:'#7c5c38'},
+    ],
+    savingsBalance: 49668,
+    savings: {monthTarget:6000, monthActual:3000, yearTarget:60000, yearActual:18000},
+    txs: [
+      {date:'06/15',amount:8000,category:'Living',  remark:'rent',        type:'expense'},
+      {date:'06/02',amount:380, category:'Grocery', remark:'supermarket', type:'expense'},
+      {date:'06/01',amount:240, category:'Eat out', remark:'sushiro',     type:'expense'},
     ]
-  };
-}
-function defaultTxs(c, mk) {
-  if (c === 'SGD' && mk === '2026-06') return [
-    {date:'2026-06-03',amount:12.8,  category:'Eat out',    remark:'lunch',         type:'expense'},
-    {date:'2026-06-02',amount:89,    category:'Leisure',    remark:'hle clothesx2', type:'expense'},
-    {date:'2026-06-02',amount:7.6,   category:'Consumption',remark:'food scale',    type:'expense'},
-    {date:'2026-06-02',amount:104.8, category:'Grocery',    remark:'donki',         type:'expense'},
-    {date:'2026-06-15',amount:1400,  category:'Living',     remark:'rent',          type:'expense'},
-    {date:'2026-06-02',amount:528,   category:'Loans',      remark:'just need',     type:'expense'},
-    {date:'2026-06-02',amount:80,    category:'Transport',  remark:'just need',     type:'expense'},
-    {date:'2026-06-02',amount:10.7,  category:'Eat out',    remark:'donki',         type:'expense'},
-    {date:'2026-06-01',amount:30.7,  category:'Eat out',    remark:'sushiro',       type:'expense'}
-  ];
-  if (c === 'HKD' && mk === '2026-06') return [
-    {date:'2026-06-15',amount:8000, category:'Living',  remark:'rent',        type:'expense'},
-    {date:'2026-06-02',amount:380,  category:'Grocery', remark:'supermarket', type:'expense'},
-    {date:'2026-06-01',amount:240,  category:'Eat out', remark:'sushiro',     type:'expense'}
-  ];
-  return [];
-}
-
-// ── DATA ACCESS ───────────────────────────────────────────────
-function getShared(c) { return cacheGet('shared_'+c, defaultShared(c)); }
-function saveShared(c, d) { cacheSet('shared_'+c, d); pushToSheets('shared_'+c, d); }
-function getFxRate() { return cacheGet('fx_rate', 6); } // 1 SGD = N HKD
-function saveFxRate(r) { cacheSet('fx_rate', r); pushToSheets('fx_rate', r); }
-// Convert amount to SGD
-function toSGD(amount, fromCurr) { return fromCurr === 'SGD' ? amount : amount / getFxRate(); }
-// Convert amount to viewing currency
-function toViewCurr(amount, fromCurr) {
-  if (fromCurr === curr) return amount;
-  if (curr === 'SGD') return amount / getFxRate();   // HKD → SGD
-  return amount * getFxRate();                        // SGD → HKD
-}
-// Get combined categories from both currencies, amounts converted to curr
-function getCombinedCategories(mk) {
-  var map = {}; // keyed by name, merged across currencies
-  ['SGD','HKD'].forEach(function(c) {
-    var shared = getShared(c);
-    var txs = getTxs(c, mk);
-    computeSpent(shared.categories, txs);
-    shared.categories.forEach(function(cat) {
-      var name = cat.name;
-      var budgetConverted = toViewCurr(cat.budget, c);
-      var amountConverted = toViewCurr(cat.amount, c);
-      if (map[name]) {
-        map[name].budget += budgetConverted;
-        map[name].amount += amountConverted;
-      } else {
-        map[name] = {
-          name: name,
-          color: cat.color,
-          budget: budgetConverted,
-          amount: amountConverted
-        };
-      }
-    });
-  });
-  return Object.keys(map).map(function(k) { return map[k]; });
-}
-function mk(y, m) { return y+'-'+(m<10?'0':'')+m; }
-function curMk() { return mk(viewMonth.year, viewMonth.month); }
-function getTxs(c, k) { return cacheGet('txs_'+c+'_'+k, defaultTxs(c, k)); }
-function saveTxs(c, k, txs) { cacheSet('txs_'+c+'_'+k, txs); pushToSheets('txs_'+c+'_'+k, txs); }
-
-function computeSpent(cats, txs) {
-  cats.forEach(function(c) { c.amount = 0; });
-  txs.forEach(function(t) {
-    if (t.type === 'expense') {
-      var cat = cats.find(function(c) { return c.name === t.category; });
-      if (cat) cat.amount += t.amount;
-    }
-  });
-}
-function totalCatBudget(shared) {
-  return shared.categories.reduce(function(s,c) { return s + (c.budget||0); }, 0);
-}
+  }
+};
 
 // ── STATE ─────────────────────────────────────────────────────
-var curr = 'SGD';
-// FX: 1 SGD = N HKD (user-editable)
-var entryType = 'expense';
-var donutChart = null;
-var txOpen = false;
-var txEditMode = false;
-var catEditMode = false;
-var ovEditOpen = false;
-var savEditOpen = false;
-var pickerOpen = false;
-var pickerTmpYear = 2026;
-var viewMonth = {year:2026, month:6};
-var sortState = {SGD:{field:'date',asc:false}, HKD:{field:'date',asc:false}};
-// Filter state
-var filterOpen = false;
-var filterCats = [];
-var filterDateFrom = '';
-var filterDateTo = '';
+let curr = 'SGD';
+let entryType = 'expense';
+let donutChart = null;
+let txOpen = false;
+let catEditMode = false;
+let ovEditOpen = false;
+let savEditOpen = false;
 
 // ── UTILS ─────────────────────────────────────────────────────
-var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-function fmt(n) { return Number(n).toLocaleString('en',{maximumFractionDigits:0}); }
-function fmtD(n) { return Number(n).toLocaleString('en',{minimumFractionDigits:1,maximumFractionDigits:1}); }
-function usedColor(p) { return p>=90?'#b84040':p>=70?'#c07820':'#7c5c38'; }
+const fmt  = n => Number(n).toLocaleString('en',{maximumFractionDigits:0});
+const fmtD = n => Number(n).toLocaleString('en',{minimumFractionDigits:1,maximumFractionDigits:1});
+
+function usedColor(pct) {
+  if (pct >= 90) return '#b84040';
+  if (pct >= 70) return '#c07820';
+  return '#7c5c38';
+}
+
 function showToast(msg, isErr) {
-  var t = document.getElementById('toast');
+  const t = document.getElementById('toast');
   t.textContent = msg;
   t.style.borderColor = isErr ? 'var(--red)' : 'var(--green)';
   t.style.color = isErr ? 'var(--red)' : 'var(--green)';
   t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 2200);
-}
-function updateTopbarLabel() {
-  var lbl = MONTHS[viewMonth.month-1]+' '+viewMonth.year;
-  document.getElementById('topbar-month-label').textContent = lbl;
-  document.getElementById('mnav-label-txt').textContent = lbl;
+  setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-// ── MONTH NAV ─────────────────────────────────────────────────
-function shiftMonth(d) {
-  var y = viewMonth.year, m = viewMonth.month + d;
-  if (m > 12) { m = 1; y++; }
-  if (m < 1)  { m = 12; y--; }
-  viewMonth = {year:y, month:m};
-  closePicker();
-  resetEditStates();
-  render();
-}
-function togglePicker() {
-  pickerOpen = !pickerOpen;
-  pickerTmpYear = viewMonth.year;
-  document.getElementById('mpicker-drop').classList.toggle('open', pickerOpen);
-  if (pickerOpen) renderPickerGrid();
-}
-function closePicker() {
-  pickerOpen = false;
-  document.getElementById('mpicker-drop').classList.remove('open');
-}
-function pickerYear(d) {
-  pickerTmpYear += d;
-  renderPickerGrid();
-}
-function renderPickerGrid() {
-  document.getElementById('picker-year-lbl').textContent = pickerTmpYear;
-  document.getElementById('picker-month-grid').innerHTML = MONTHS.map(function(m, i) {
-    var active = pickerTmpYear === viewMonth.year && (i+1) === viewMonth.month;
-    return '<button class="mpicker-m'+(active?' active':'')+'" onclick="selectPickerMonth('+(i+1)+')">'+m+'</button>';
-  }).join('');
-}
-function selectPickerMonth(m) {
-  viewMonth = {year:pickerTmpYear, month:m};
-  closePicker();
-  resetEditStates();
-  render();
-}
-document.addEventListener('click', function(e) {
-  if (pickerOpen && !document.getElementById('mpicker-wrap').contains(e.target)) closePicker();
-});
-
-// ── SORT ──────────────────────────────────────────────────────
-function setSort(field) {
-  var ss = sortState[curr];
-  if (ss.field === field) { ss.asc = !ss.asc; }
-  else { ss.field = field; ss.asc = (field !== 'date'); }
-  ['date','cat','amt'].forEach(function(f) {
-    document.getElementById('sort-'+f).classList.toggle('active', ss.field===f);
+// ── COMPUTE SPENT FROM TRANSACTIONS (single source of truth) ──
+// Category amounts are ALWAYS derived from txs — never stored separately.
+// This means delete/add tx always keeps dashboard in sync automatically.
+function computeSpent(d) {
+  d.categories.forEach(c => c.amount = 0);
+  d.txs.forEach(t => {
+    if (t.type === 'expense') {
+      const cat = d.categories.find(c => c.name === t.category);
+      if (cat) cat.amount += t.amount;
+    }
   });
-  document.getElementById('arr-date').innerHTML = ss.field==='date' ? (ss.asc?'&#8593;':'&#8595;') : '&#8595;';
-  document.getElementById('arr-cat').innerHTML  = ss.field==='cat'  ? (ss.asc?'&#8593;':'&#8595;') : '&#8595;';
-  document.getElementById('arr-amt').innerHTML  = ss.field==='amt'  ? (ss.asc?'&#8593;':'&#8595;') : '&#8595;';
-  renderTxList();
-}
-function sortedTxs(txs) {
-  var ss = sortState[curr];
-  var arr = txs.slice();
-  arr.sort(function(a, b) {
-    var va, vb;
-    if (ss.field === 'date')     { va = a.date||''; vb = b.date||''; }
-    else if (ss.field === 'cat') { va = (a.category||'').toLowerCase(); vb = (b.category||'').toLowerCase(); }
-    else                         { va = a.amount; vb = b.amount; }
-    if (va < vb) return ss.asc ? -1 : 1;
-    if (va > vb) return ss.asc ?  1 : -1;
-    return 0;
-  });
-  return arr;
 }
 
-// ── FILTER ────────────────────────────────────────────────────
-function toggleFilter() {
-  filterOpen = !filterOpen;
-  document.getElementById('filter-bar').classList.toggle('show', filterOpen);
-  document.getElementById('filter-toggle-btn').classList.toggle('active', filterOpen);
-  if (filterOpen) buildFilterChips();
-}
-function buildFilterChips() {
-  var shared = getShared(curr);
-  var html = '';
-  for (var i = 0; i < shared.categories.length; i++) {
-    var name = shared.categories[i].name;
-    var on = filterCats.indexOf(name) >= 0;
-    html += '<button class="filter-chip'+(on?' on':'')+'" onclick="toggleFilterCat('+i+')">'+name+'</button>';
-  }
-  document.getElementById('filter-cat-chips').innerHTML = html;
-}
-function toggleFilterCat(idx) {
-  var shared = getShared(curr);
-  var name = shared.categories[idx].name;
-  var pos = filterCats.indexOf(name);
-  if (pos >= 0) filterCats.splice(pos, 1);
-  else filterCats.push(name);
-  buildFilterChips();
-  renderTxList();
-}
-function applyFilter() {
-  filterDateFrom = document.getElementById('filter-date-from').value;
-  filterDateTo   = document.getElementById('filter-date-to').value;
-  renderTxList();
-}
-function clearFilter() {
-  filterCats = [];
-  filterDateFrom = '';
-  filterDateTo = '';
-  document.getElementById('filter-date-from').value = '';
-  document.getElementById('filter-date-to').value = '';
-  buildFilterChips();
-  renderTxList();
-}
-function isFiltered() {
-  return filterCats.length > 0 || filterDateFrom !== '' || filterDateTo !== '';
-}
-function getFilteredTxs(txs) {
-  return txs.filter(function(t) {
-    if (filterCats.length > 0 && filterCats.indexOf(t.category) < 0) return false;
-    if (filterDateFrom && t.date < filterDateFrom) return false;
-    if (filterDateTo   && t.date > filterDateTo)   return false;
-    return true;
-  });
-}
-function updateFilterSummary(filtered) {
-  var sumEl = document.getElementById('filter-summary');
-  if (!isFiltered()) { sumEl.classList.remove('show'); return; }
-  var expTotal = 0, incTotal = 0;
-  filtered.forEach(function(t) {
-    if (t.type === 'expense') expTotal += t.amount;
-    else incTotal += t.amount;
-  });
-  var parts = [];
-  if (expTotal > 0) parts.push('-'+fmtD(expTotal));
-  if (incTotal > 0) parts.push('+'+fmtD(incTotal));
-  document.getElementById('fs-total').textContent = curr+' '+(parts.join(' / ')||'0');
-  document.getElementById('fs-label').textContent = filtered.length+' item'+(filtered.length!==1?'s':'');
-  var labels = [];
-  if (filterCats.length > 0) labels.push(filterCats.join(', '));
-  if (filterDateFrom || filterDateTo) labels.push((filterDateFrom||'…')+' → '+(filterDateTo||'…'));
-  document.getElementById('fs-sub').textContent = labels.join(' · ');
-  sumEl.classList.add('show');
-}
-
-// ── RENDER ────────────────────────────────────────────────────
+// ── CORE RENDER ───────────────────────────────────────────────
 function render() {
-  updateTopbarLabel();
-  var key = curMk();
-  // Combined across both currencies for overview
-  var combined = getCombinedCategories(key);
-  var totalBudget = combined.reduce(function(s,c) { return s+c.budget; }, 0);
-  var spent = combined.reduce(function(s,c) { return s+c.amount; }, 0);
-  var remaining = totalBudget - spent;
-  var usedPct = totalBudget > 0 ? (spent/totalBudget*100) : 0;
+  const d = DATA[curr];
+  computeSpent(d); // recompute from txs every time
 
-  var remEl = document.getElementById('ov-remaining');
+  const spent = d.categories.reduce((s,c) => s + c.amount, 0);
+  const remaining = d.budget - spent;
+  const usedPct = d.budget > 0 ? (spent / d.budget * 100) : 0;
+
+  const remEl = document.getElementById('ov-remaining');
   remEl.textContent = fmtD(remaining);
-  remEl.className = 'ov-val '+(remaining<0?'red':remaining<totalBudget*.15?'amber':'green');
-  var shared = getShared(curr);
-  document.getElementById('ov-savings-disp').textContent = fmt(shared.savingsBalance||0);
-  document.getElementById('ov-curr-sub').textContent = curr+' remaining (combined)';
-  document.getElementById('ov-savings-sub').textContent = curr+' balance';
+  remEl.className = 'ov-val ' + (remaining < 0 ? 'red' : remaining < d.budget * 0.15 ? 'amber' : 'green');
 
-  var bar = document.getElementById('ov-bar');
-  bar.style.width = Math.min(Math.max(usedPct,0),100)+'%';
+  document.getElementById('ov-savings-disp').textContent = fmt(d.savingsBalance || 0);
+  document.getElementById('ov-curr-sub').textContent = curr + ' remaining';
+  document.getElementById('ov-savings-sub').textContent = curr + ' savings';
+
+  const bar = document.getElementById('ov-bar');
+  bar.style.width = Math.min(Math.max(usedPct, 0), 100) + '%';
   bar.style.background = usedColor(usedPct);
-  document.getElementById('ov-pct').textContent = usedPct.toFixed(1)+'% used';
-  document.getElementById('ov-budget-total').textContent = '/ '+curr+' '+fmt(totalBudget);
+  document.getElementById('ov-pct').textContent = usedPct.toFixed(1) + '% used';
+  document.getElementById('ov-prog-lbl').textContent = 'Budget used';
 
-  renderDonut(combined, spent);
-  renderSavings(shared);
-  renderCats(shared, key); // per-currency categories card
-  if (txOpen) renderTxList();
+  renderDonut(d, spent);
+  renderSavings(d);
+  renderCats(d, spent);
+  renderTxList(d);
 }
 
 // ── DONUT ─────────────────────────────────────────────────────
-function renderDonut(combined, spent) {
-  document.getElementById('donut-leg').innerHTML = combined.map(function(c) {
-    var pct = spent > 0 ? (c.amount/spent*100).toFixed(0) : 0;
-    return '<div class="leg-item"><div class="leg-dot" style="background:'+c.color+'"></div>'+c.name+' '+pct+'%</div>';
-  }).join('');
+function renderDonut(d, spent) {
+  document.getElementById('donut-leg').innerHTML = d.categories.map(c =>
+    `<div class="leg-item"><div class="leg-dot" style="background:${c.color}"></div>${c.name} ${spent>0?(c.amount/spent*100).toFixed(0):0}%</div>`
+  ).join('');
+
   if (donutChart) donutChart.destroy();
   donutChart = new Chart(document.getElementById('donutChart'), {
     type:'doughnut',
     data:{
-      labels: combined.map(function(c) { return c.name; }),
+      labels: d.categories.map(c=>c.name),
       datasets:[{
-        data: combined.map(function(c) { return c.amount||0; }),
-        backgroundColor: combined.map(function(c) { return c.color; }),
+        data: d.categories.map(c=>c.amount),
+        backgroundColor: d.categories.map(c=>c.color),
         borderWidth:3, borderColor:'#faf7f2', hoverBorderColor:'#faf7f2'
       }]
     },
@@ -738,477 +427,345 @@ function renderDonut(combined, spent) {
       responsive:true, maintainAspectRatio:false, cutout:'68%',
       plugins:{
         legend:{display:false},
-        tooltip:{callbacks:{label:function(ctx) {
-          var pct = spent>0?(ctx.raw/spent*100).toFixed(1):0;
-          return ' '+ctx.label+': '+curr+' '+fmtD(ctx.raw)+' ('+pct+'%)';
-        }}}
+        tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${curr} ${fmtD(ctx.raw)} (${spent>0?(ctx.raw/spent*100).toFixed(1):0}%)`}}
       }
     }
   });
 }
 
 // ── SAVINGS ───────────────────────────────────────────────────
-function renderSavings(shared) {
-  var s = shared.savings;
-  var mPct = s.monthTarget>0 ? Math.min(s.monthActual/s.monthTarget*100,100).toFixed(0) : 0;
-  var yPct = s.yearTarget>0  ? Math.min(s.yearActual/s.yearTarget*100,100).toFixed(0)   : 0;
-  function col(p) { return p>=100?'#3a7d5e':p>=50?'#3a5c8a':'#c07820'; }
-  var lbl = MONTHS[viewMonth.month-1]+' '+viewMonth.year;
-  document.getElementById('sav-list').innerHTML =
-    '<div class="sav-row">'+
-      '<div class="sav-hdr">'+
-        '<div><div class="sav-title">This month</div><div class="sav-period">'+curr+' &middot; '+lbl+'</div></div>'+
-        '<div class="sav-nums"><div style="font-size:15px;font-weight:500;color:var(--text)">'+fmt(s.monthActual)+'</div><div style="margin-top:2px">target '+fmt(s.monthTarget)+'</div></div>'+
-      '</div>'+
-      '<div class="prog-track"><div class="prog-fill" style="width:'+mPct+'%;background:'+col(mPct)+'"></div></div>'+
-      '<div style="font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-top:4px;text-align:right">'+mPct+'% of monthly target</div>'+
-    '</div>'+
-    '<div class="sav-row">'+
-      '<div class="sav-hdr">'+
-        '<div><div class="sav-title">This year</div><div class="sav-period">'+curr+' &middot; '+viewMonth.year+'</div></div>'+
-        '<div class="sav-nums"><div style="font-size:15px;font-weight:500;color:var(--text)">'+fmt(s.yearActual)+'</div><div style="margin-top:2px">target '+fmt(s.yearTarget)+'</div></div>'+
-      '</div>'+
-      '<div class="prog-track"><div class="prog-fill" style="width:'+yPct+'%;background:'+col(yPct)+'"></div></div>'+
-      '<div style="font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-top:4px;text-align:right">'+yPct+'% of yearly target</div>'+
-    '</div>';
+function renderSavings(d) {
+  const s = d.savings;
+  const mPct = s.monthTarget > 0 ? Math.min(s.monthActual/s.monthTarget*100,100).toFixed(0) : 0;
+  const yPct = s.yearTarget  > 0 ? Math.min(s.yearActual /s.yearTarget *100,100).toFixed(0) : 0;
+  const col = p => p>=100?'#3a7d5e':p>=50?'#3a5c8a':'#c07820';
+
+  document.getElementById('sav-list').innerHTML = `
+    <div class="sav-row">
+      <div class="sav-hdr">
+        <div><div class="sav-title">This month</div><div class="sav-period">${curr} · Jun 2026</div></div>
+        <div class="sav-nums"><div style="font-size:15px;font-weight:500;color:var(--text)">${fmt(s.monthActual)}</div><div style="margin-top:2px">target ${fmt(s.monthTarget)}</div></div>
+      </div>
+      <div class="prog-track"><div class="prog-fill" style="width:${mPct}%;background:${col(mPct)}"></div></div>
+      <div class="sav-pct-lbl">${mPct}% of monthly target</div>
+    </div>
+    <div class="sav-row">
+      <div class="sav-hdr">
+        <div><div class="sav-title">This year</div><div class="sav-period">${curr} · 2026</div></div>
+        <div class="sav-nums"><div style="font-size:15px;font-weight:500;color:var(--text)">${fmt(s.yearActual)}</div><div style="margin-top:2px">target ${fmt(s.yearTarget)}</div></div>
+      </div>
+      <div class="prog-track"><div class="prog-fill" style="width:${yPct}%;background:${col(yPct)}"></div></div>
+      <div class="sav-pct-lbl">${yPct}% of yearly target</div>
+    </div>`;
 }
 
 // ── CATEGORIES ────────────────────────────────────────────────
-function renderCats(shared, mk) {
-  var txs = getTxs(curr, mk);
-  computeSpent(shared.categories, txs);
-  var spent = shared.categories.reduce(function(s,c) { return s+c.amount; }, 0);
-  document.getElementById('cat-list').innerHTML = shared.categories.map(function(c, i) {
-    var pct = spent>0 ? (c.amount/spent*100) : 0;
-    var over = c.amount > c.budget && c.budget > 0;
+function renderCats(d, spent) {
+  document.getElementById('cat-list').innerHTML = d.categories.map((c,i) => {
+    const pct = spent>0 ? (c.amount/spent*100) : 0;
+    const leftPct = c.budget>0 ? Math.max(0, (c.budget-c.amount)/c.budget*100) : 0;
+    const over = c.amount > c.budget && c.budget > 0;
+
     if (catEditMode) {
-      return '<div class="cat-row">'+
-        '<button class="del-btn" onclick="delCat('+i+')" style="display:block">&#215;</button>'+
-        '<div class="cat-dot" style="background:'+c.color+'"></div>'+
-        '<input class="inline-text-inp" value="'+c.name+'" onchange="renameCat('+i+',this.value)">'+
-        '<input class="inline-inp" type="number" value="'+c.budget+'" placeholder="Budget" onchange="updateCatBgt('+i+',this.value)">'+
-      '</div>';
+      // fully editable row: name + amount inputs
+      return `<div class="cat-row">
+        <button class="del-btn" onclick="delCat(${i})" style="display:block">×</button>
+        <div class="cat-dot" style="background:${c.color}"></div>
+        <input class="inline-text-inp" value="${c.name}" onchange="DATA['${curr}'].categories[${i}].name=this.value;render()">
+        <input class="inline-inp" type="number" value="${c.amount}" onchange="updateCatAmt(${i},this.value)">
+      </div>`;
     }
-    return '<div class="cat-row">'+
-      '<div class="cat-dot" style="background:'+c.color+'"></div>'+
-      '<div class="cat-name">'+c.name+'</div>'+
-      '<div class="cat-bar-wrap">'+
-        '<div class="cat-mini-track"><div class="cat-mini-fill" style="width:'+Math.min(pct,100)+'%;background:'+(over?'#b84040':c.color)+'"></div></div>'+
-        '<div class="cat-pct">'+pct.toFixed(0)+'%</div>'+
-      '</div>'+
-      '<div class="cat-amount" style="color:'+(over?'#b84040':'var(--text)')+'">'+fmtD(c.amount)+'</div>'+
-    '</div>';
+
+    return `<div class="cat-row">
+      <button class="del-btn" onclick="delCat(${i})">×</button>
+      <div class="cat-dot" style="background:${c.color}"></div>
+      <div class="cat-name">${c.name}</div>
+      <div class="cat-bar-wrap">
+        <div class="cat-mini-track"><div class="cat-mini-fill" style="width:${Math.min(pct,100)}%;background:${over?'#b84040':c.color}"></div></div>
+        <div class="cat-pct">${leftPct.toFixed(0)}% left</div>
+      </div>
+      <div class="cat-amount" style="color:${over?'#b84040':'var(--text)'}">${fmtD(c.amount)}</div>
+    </div>`;
   }).join('');
-}
-function renameCat(i, val) {
-  var shared = getShared(curr);
-  var oldName = shared.categories[i].name;
-  shared.categories[i].name = val;
-  saveShared(curr, shared);
-  // update all cached tx months
-  Object.keys(_cache).forEach(function(k) {
-    if (k.indexOf('txs_'+curr+'_') === 0) {
-      var txs = _cache[k];
-      var changed = false;
-      txs.forEach(function(t) { if (t.category===oldName) { t.category=val; changed=true; } });
-      if (changed) { cacheSet(k, txs); pushToSheets(k, txs); }
-    }
-  });
-  render();
-}
-function updateCatBgt(i, val) {
-  var shared = getShared(curr);
-  shared.categories[i].budget = parseFloat(val)||0;
-  saveShared(curr, shared);
-  render();
-}
-function delCat(i) {
-  var shared = getShared(curr);
-  if (!confirm('Remove "'+shared.categories[i].name+'"?')) return;
-  shared.categories.splice(i,1);
-  saveShared(curr, shared);
-  render();
-  showToast('Category removed');
-}
-function addCat() {
-  var name = document.getElementById('cat-new-name').value.trim();
-  if (!name) { showToast('Enter a name', true); return; }
-  var budget = parseFloat(document.getElementById('cat-new-bgt').value)||0;
-  var palette = ['#3a7d5e','#b84040','#3a5c8a','#6b5090','#c07820','#7c5c38','#a04060','#2d7a8a','#5a7a3a','#8a6030'];
-  var shared = getShared(curr);
-  var color = palette[shared.categories.length % palette.length];
-  shared.categories.push({name:name, budget:budget, color:color, amount:0});
-  saveShared(curr, shared);
-  document.getElementById('cat-new-name').value = '';
-  document.getElementById('cat-new-bgt').value = '';
-  render();
-  showToast('Category added');
+
+  if (catEditMode) {
+    document.getElementById('cat-card').classList.add('edit-mode');
+  }
 }
 
-// ── TX LIST ───────────────────────────────────────────────────
-function renderTxList() {
-  var key = curMk();
-  var txs = getTxs(curr, key);
-  var list = document.getElementById('tx-list');
+function updateCatAmt(i, val) {
+  DATA[curr].categories[i].amount = parseFloat(val) || 0;
+  // re-render without switching edit mode off
+  const d = DATA[curr];
+  const spent = d.categories.reduce((s,c)=>s+c.amount,0);
+  renderDonut(d, spent);
+  renderSavings(d);
+  // update overview numbers only
+  const remaining = d.budget - spent;
+  const usedPct = d.budget > 0 ? (spent/d.budget*100) : 0;
+  const remEl = document.getElementById('ov-remaining');
+  remEl.textContent = fmtD(remaining);
+  remEl.className = 'ov-val '+(remaining<0?'red':remaining<d.budget*.15?'amber':'green');
+  const bar = document.getElementById('ov-bar');
+  bar.style.width = Math.min(Math.max(usedPct,0),100)+'%';
+  bar.style.background = usedColor(usedPct);
+  document.getElementById('ov-pct').textContent = usedPct.toFixed(1)+'% used';
+}
 
-  var display = isFiltered() ? getFilteredTxs(txs) : txs;
-  updateFilterSummary(display);
-  var sorted = sortedTxs(display);
-
-  if (!txs.length) {
-    list.innerHTML = '<div style="padding:12px 0;color:var(--text3);font-size:13px;border-top:0.5px solid var(--border)">No entries for this month</div>';
+// ── HISTORY ───────────────────────────────────────────────────
+function renderTxList(d) {
+  const list = document.getElementById('tx-list');
+  if (!d.txs.length) {
+    list.innerHTML = '<div style="padding:12px 0;color:var(--text3);font-size:13px;border-top:0.5px solid var(--border)">No entries yet</div>';
     return;
   }
-  if (!sorted.length) {
-    list.innerHTML = '<div style="padding:12px 0;color:var(--text3);font-size:13px;border-top:0.5px solid var(--border)">No entries match filter</div>';
-    return;
-  }
-
-  list.innerHTML = sorted.map(function(t) {
-    var origIdx = txs.indexOf(t);
-    var dateDisp = t.date ? t.date.slice(5).replace('-','/') : '—';
-    var amtStr = (t.type==='income'?'+':'-')+fmtD(t.amount);
-    var amtCls = 'tx-amount'+(t.type==='income'?' inc':'');
-    var editBtn = txEditMode ? '<button class="pen-btn" onclick="openTxEdit('+origIdx+')">&#9998;</button>' : '';
-    var delBtn = txEditMode ? '<button class="del-btn" onclick="delTx('+origIdx+')" style="display:block">&#215;</button>' : '';
-    return '<div class="tx-row">'+
-      '<div class="tx-date">'+dateDisp+'</div>'+
-      '<div class="tx-info">'+
-        '<div class="tx-cat">'+t.category+'</div>'+
-        (t.remark?'<div class="tx-remark">'+t.remark+'</div>':'')+
-      '</div>'+
-      '<div class="tx-right">'+
-        editBtn+
-        '<div class="'+amtCls+'">'+amtStr+'</div>'+
-        delBtn+
-      '</div>'+
-    '</div>';
+  list.innerHTML = d.txs.map((t,i) => {
+    if (txOpen && catEditMode) {
+      // editable tx row
+      return `<div class="tx-row">
+        <div class="tx-date">${t.date}</div>
+        <div class="tx-info">
+          <input class="inline-text-inp" value="${t.category}" onchange="DATA['${curr}'].txs[${i}].category=this.value" style="margin-bottom:3px">
+          <input class="inline-text-inp" value="${t.remark}" onchange="DATA['${curr}'].txs[${i}].remark=this.value" placeholder="remark">
+        </div>
+        <div class="tx-right">
+          <input class="inline-inp" type="number" value="${t.amount}" onchange="DATA['${curr}'].txs[${i}].amount=parseFloat(this.value)||0">
+          <button class="del-btn" onclick="delTx(${i})" style="display:block">×</button>
+        </div>
+      </div>`;
+    }
+    return `<div class="tx-row">
+      <div class="tx-date">${t.date}</div>
+      <div class="tx-info">
+        <div class="tx-cat">${t.category}</div>
+        <div class="tx-remark">${t.remark}</div>
+      </div>
+      <div class="tx-right">
+        <div class="tx-amount ${t.type==='income'?'inc':''}">${t.type==='income'?'+':'-'}${fmtD(t.amount)}</div>
+        <button class="del-btn" onclick="delTx(${i})" style="display:block">×</button>
+      </div>
+    </div>`;
   }).join('');
-}
-function toggleTx() {
-  txOpen = !txOpen;
-  document.getElementById('tx-list').classList.toggle('open', txOpen);
-  document.getElementById('tx-icon').classList.toggle('open', txOpen);
-  document.getElementById('sort-bar').classList.toggle('show', txOpen);
-  if (txOpen) renderTxList();
-}
-function toggleTxEdit() {
-  txEditMode = !txEditMode;
-  document.getElementById('tx-edit-btn').classList.toggle('on', txEditMode);
-  document.getElementById('tx-edit-btn').textContent = txEditMode ? 'done' : 'edit';
-  renderTxList();
-}
-function delTx(i) {
-  var key = curMk();
-  var txs = getTxs(curr, key);
-  if (!confirm('Delete this entry?')) return;
-  txs.splice(i, 1);
-  saveTxs(curr, key, txs);
-  render();
-  showToast('Entry deleted');
-}
-
-// ── EDIT PANELS ───────────────────────────────────────────────
-function toggleCatEdit() {
-  catEditMode = !catEditMode;
-  document.getElementById('cat-card').classList.toggle('edit-mode', catEditMode);
-  document.getElementById('cat-btn').classList.toggle('on', catEditMode);
-  document.getElementById('cat-btn').textContent = catEditMode ? 'done' : 'edit';
-  document.getElementById('cat-add-row').classList.toggle('show', catEditMode);
-  render();
-}
-function toggleOvEdit() {
-  ovEditOpen = !ovEditOpen;
-  document.getElementById('ov-edit-panel').style.display = ovEditOpen ? 'block' : 'none';
-  document.getElementById('ov-btn').classList.toggle('on', ovEditOpen);
-  document.getElementById('ov-btn').textContent = ovEditOpen ? 'done' : 'edit';
-  if (ovEditOpen) {
-    var s = getShared(curr);
-    document.getElementById('ov-income-inp').value = s.income;
-    document.getElementById('ov-savings-inp').value = s.savingsBalance||0;
-    document.getElementById('ov-fx-inp').value = getFxRate();
-  }
-}
-function saveOv() {
-  var s = getShared(curr);
-  var inc = parseFloat(document.getElementById('ov-income-inp').value);
-  var sav = parseFloat(document.getElementById('ov-savings-inp').value);
-  var fx  = parseFloat(document.getElementById('ov-fx-inp').value);
-  if (!isNaN(inc)) s.income = inc;
-  if (!isNaN(sav)) s.savingsBalance = sav;
-  if (!isNaN(fx) && fx > 0) saveFxRate(fx);
-  saveShared(curr, s);
-  toggleOvEdit();
-  render();
-  showToast('Overview updated');
-}
-function toggleSavEdit() {
-  savEditOpen = !savEditOpen;
-  document.getElementById('sav-edit-panel').style.display = savEditOpen ? 'block' : 'none';
-  document.getElementById('sav-btn').classList.toggle('on', savEditOpen);
-  document.getElementById('sav-btn').textContent = savEditOpen ? 'done' : 'edit targets';
-  if (savEditOpen) {
-    var s = getShared(curr).savings;
-    document.getElementById('sav-edit-fields').innerHTML =
-      '<div class="ep-grid">'+
-        '<div><div class="form-label">Month target</div><input class="form-input" type="number" id="sav-mt" value="'+s.monthTarget+'" style="padding:8px 10px;font-size:14px"></div>'+
-        '<div><div class="form-label">Month actual</div><input class="form-input" type="number" id="sav-ma" value="'+s.monthActual+'" style="padding:8px 10px;font-size:14px"></div>'+
-        '<div><div class="form-label">Year target</div><input class="form-input" type="number" id="sav-yt" value="'+s.yearTarget+'" style="padding:8px 10px;font-size:14px"></div>'+
-        '<div><div class="form-label">Year actual</div><input class="form-input" type="number" id="sav-ya" value="'+s.yearActual+'" style="padding:8px 10px;font-size:14px"></div>'+
-      '</div>'+
-      '<button class="add-btn" style="width:100%;padding:9px;margin-top:2px" onclick="saveSavings()">Save</button>';
-  }
-}
-function saveSavings() {
-  var shared = getShared(curr);
-  var s = shared.savings;
-  var mt = parseFloat(document.getElementById('sav-mt').value);
-  var ma = parseFloat(document.getElementById('sav-ma').value);
-  var yt = parseFloat(document.getElementById('sav-yt').value);
-  var ya = parseFloat(document.getElementById('sav-ya').value);
-  if (!isNaN(mt)) s.monthTarget = mt;
-  if (!isNaN(ma)) s.monthActual = ma;
-  if (!isNaN(yt)) s.yearTarget  = yt;
-  if (!isNaN(ya)) s.yearActual  = ya;
-  saveShared(curr, shared);
-  toggleSavEdit();
-  render();
-  showToast('Savings updated');
-}
-function resetEditStates() {
-  catEditMode=false; ovEditOpen=false; savEditOpen=false; txEditMode=false;
-  filterOpen=false; filterCats=[]; filterDateFrom=''; filterDateTo='';
-  document.getElementById('ov-edit-panel').style.display='none';
-  document.getElementById('ov-btn').classList.remove('on');
-  document.getElementById('ov-btn').textContent='edit';
-  document.getElementById('sav-edit-panel').style.display='none';
-  document.getElementById('sav-btn').classList.remove('on');
-  document.getElementById('sav-btn').textContent='edit targets';
-  document.getElementById('cat-card').classList.remove('edit-mode');
-  document.getElementById('cat-btn').classList.remove('on');
-  document.getElementById('cat-btn').textContent='edit';
-  document.getElementById('cat-add-row').classList.remove('show');
-  document.getElementById('tx-edit-btn').classList.remove('on');
-  document.getElementById('tx-edit-btn').textContent='edit';
-  document.getElementById('filter-bar').classList.remove('show');
-  document.getElementById('filter-summary').classList.remove('show');
-  document.getElementById('filter-toggle-btn').classList.remove('active');
 }
 
 // ── CURRENCY ──────────────────────────────────────────────────
 function setCurrency(c) {
+  // Reset edit states before switching — never carry edit mode across currencies
+  catEditMode = false;
+  ovEditOpen = false;
+  savEditOpen = false;
+  document.getElementById('ov-edit-panel').style.display = 'none';
+  document.getElementById('ov-btn').classList.remove('on');
+  document.getElementById('ov-btn').textContent = 'edit';
+  document.getElementById('sav-edit-panel').style.display = 'none';
+  document.getElementById('sav-btn').classList.remove('on');
+  document.getElementById('sav-btn').textContent = 'edit targets';
+  document.getElementById('cat-card').classList.remove('edit-mode');
+  document.getElementById('cat-btn').classList.remove('on');
+  document.getElementById('cat-btn').textContent = 'edit';
+  document.getElementById('cat-add-row').classList.remove('show');
+  document.getElementById('tx-card').classList.remove('edit-mode');
+  // Now switch currency
   curr = c;
-  resetEditStates();
-  document.querySelectorAll('.curr-btn').forEach(function(b) { b.classList.toggle('active', b.textContent===c); });
+  document.querySelectorAll('.curr-btn').forEach(b => b.classList.toggle('active', b.textContent === c));
   document.getElementById('f-curr').value = c;
   render();
 }
 
 // ── TABS ──────────────────────────────────────────────────────
 function switchTab(name, btn) {
-  ['donut','savings'].forEach(function(t) { document.getElementById('tab-'+t).style.display = t===name?'':'none'; });
-  document.querySelectorAll('.tab').forEach(function(b) { b.classList.remove('active'); });
+  ['donut','savings'].forEach(t => document.getElementById('tab-'+t).style.display = t===name?'':'none');
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+}
+
+// ── OVERVIEW EDIT ─────────────────────────────────────────────
+function toggleOvEdit() {
+  ovEditOpen = !ovEditOpen;
+  document.getElementById('ov-edit-panel').style.display = ovEditOpen ? 'block' : 'none';
+  document.getElementById('ov-btn').classList.toggle('on', ovEditOpen);
+  document.getElementById('ov-btn').textContent = ovEditOpen ? 'done' : 'edit';
+  if (ovEditOpen) {
+    const d = DATA[curr];
+    document.getElementById('ov-budget-inp').value = d.budget;
+    document.getElementById('ov-income-inp').value = d.income;
+    document.getElementById('ov-savings-inp').value = d.savingsBalance || 0;
+  }
+}
+
+function saveOv() {
+  const d = DATA[curr];
+  const b   = parseFloat(document.getElementById('ov-budget-inp').value);
+  const inc = parseFloat(document.getElementById('ov-income-inp').value);
+  // allow 0 — user may want to set budget to 0
+  if (!isNaN(b))   d.budget = b;
+  if (!isNaN(inc)) d.income = inc;
+  const sav = parseFloat(document.getElementById('ov-savings-inp').value);
+  if (!isNaN(sav)) d.savingsBalance = sav;
+  toggleOvEdit();
+  render();
+  showToast('Overview updated');
+}
+
+// ── CAT EDIT ──────────────────────────────────────────────────
+function toggleCatEdit() {
+  catEditMode = !catEditMode;
+  document.getElementById('cat-btn').classList.toggle('on', catEditMode);
+  document.getElementById('cat-btn').textContent = catEditMode ? 'done' : 'edit';
+  document.getElementById('cat-add-row').classList.toggle('show', catEditMode);
+  document.getElementById('cat-card').classList.toggle('edit-mode', catEditMode);
+  // also toggle tx edit mode so history is editable when cats are
+  document.getElementById('tx-card').classList.toggle('edit-mode', catEditMode);
+  render();
+}
+
+function delCat(i) {
+  if (!confirm('Remove "' + DATA[curr].categories[i].name + '"?')) return;
+  DATA[curr].categories.splice(i, 1);
+  render();
+  showToast('Category removed');
+}
+
+function addCat() {
+  const name = document.getElementById('cat-new-name').value.trim();
+  if (!name) { showToast('Enter a category name', true); return; }
+  const amount = parseFloat(document.getElementById('cat-new-amt').value) || 0;
+  const budget = parseFloat(document.getElementById('cat-new-bgt').value) || 0;
+  const palette = ['#3a7d5e','#b84040','#3a5c8a','#6b5090','#c07820','#7c5c38','#a04060','#2d7a8a','#5a7a3a','#8a6030'];
+  const color = palette[DATA[curr].categories.length % palette.length];
+  DATA[curr].categories.push({name, amount, budget, color});
+  document.getElementById('cat-new-name').value = '';
+  document.getElementById('cat-new-amt').value  = '';
+  document.getElementById('cat-new-bgt').value  = '';
+  render();
+  showToast('Category added');
+}
+
+// ── SAVINGS EDIT ──────────────────────────────────────────────
+function toggleSavEdit() {
+  savEditOpen = !savEditOpen;
+  document.getElementById('sav-edit-panel').style.display = savEditOpen ? 'block' : 'none';
+  document.getElementById('sav-btn').classList.toggle('on', savEditOpen);
+  document.getElementById('sav-btn').textContent = savEditOpen ? 'done' : 'edit targets';
+  if (savEditOpen) {
+    const s = DATA[curr].savings;
+    document.getElementById('sav-edit-fields').innerHTML = `
+      <div class="ep-grid">
+        <div><div class="form-label">Month target</div><input class="form-input" type="number" id="sav-mt" value="${s.monthTarget}" style="padding:8px 10px;font-size:14px"></div>
+        <div><div class="form-label">Month actual</div><input class="form-input" type="number" id="sav-ma" value="${s.monthActual}" style="padding:8px 10px;font-size:14px"></div>
+        <div><div class="form-label">Year target</div><input class="form-input" type="number" id="sav-yt" value="${s.yearTarget}" style="padding:8px 10px;font-size:14px"></div>
+        <div><div class="form-label">Year actual</div><input class="form-input" type="number" id="sav-ya" value="${s.yearActual}" style="padding:8px 10px;font-size:14px"></div>
+      </div>
+      <button class="add-btn" style="width:100%;padding:9px;margin-top:2px" onclick="saveSavings()">Save</button>`;
+  }
+}
+
+function saveSavings() {
+  const s = DATA[curr].savings;
+  const mt = parseFloat(document.getElementById('sav-mt').value);
+  const ma = parseFloat(document.getElementById('sav-ma').value);
+  const yt = parseFloat(document.getElementById('sav-yt').value);
+  const ya = parseFloat(document.getElementById('sav-ya').value);
+  if (!isNaN(mt)) s.monthTarget = mt;
+  if (!isNaN(ma)) s.monthActual = ma;
+  if (!isNaN(yt)) s.yearTarget  = yt;
+  if (!isNaN(ya)) s.yearActual  = ya;
+  toggleSavEdit();
+  render();
+  showToast('Savings updated');
+}
+
+// ── HISTORY TOGGLE ────────────────────────────────────────────
+function toggleTx() {
+  txOpen = !txOpen;
+  const list = document.getElementById('tx-list');
+  list.classList.toggle('open', txOpen);
+  document.getElementById('tx-icon').classList.toggle('open', txOpen);
+  document.getElementById('tx-add-row').classList.toggle('show', txOpen);
+  if (txOpen) {
+    document.getElementById('tx-new-date').value = new Date().toISOString().split('T')[0];
+    refreshTxCatSel();
+    renderTxList(DATA[curr]);
+  }
+}
+
+function refreshTxCatSel() {
+  document.getElementById('tx-new-cat').innerHTML = DATA[curr].categories.map(c =>
+    `<option value="${c.name}">${c.name}</option>`
+  ).join('');
+}
+
+function delTx(i) {
+  const d = DATA[curr];
+  const t = d.txs[i];
+  // If income entry, subtract from income
+  if (t.type === 'income') d.income = Math.max(0, d.income - t.amount);
+  d.txs.splice(i, 1);
+  // computeSpent is called inside render() — category totals auto-update
+  render();
+  showToast('Entry removed');
+}
+
+function addTx() {
+  const amount  = parseFloat(document.getElementById('tx-new-amt').value);
+  const cat     = document.getElementById('tx-new-cat').value;
+  const remark  = document.getElementById('tx-new-rmk').value.trim();
+  const dateVal = document.getElementById('tx-new-date').value;
+  if (!amount || !dateVal) { showToast('Enter amount and date', true); return; }
+  const dateStr = dateVal.slice(5).replace('-','/');
+  DATA[curr].txs.unshift({date:dateStr, amount, category:cat, remark, type:'expense'});
+  // computeSpent inside render() handles category totals automatically
+  document.getElementById('tx-new-amt').value = '';
+  document.getElementById('tx-new-rmk').value = '';
+  render();
+  showToast(`${curr} ${fmtD(amount)} added`);
 }
 
 // ── LOG SHEET ─────────────────────────────────────────────────
 function openSheet() {
-  var now = new Date();
-  var isCur = now.getFullYear()===viewMonth.year && (now.getMonth()+1)===viewMonth.month;
-  document.getElementById('f-date').value = isCur
-    ? now.toISOString().split('T')[0]
-    : viewMonth.year+'-'+(viewMonth.month<10?'0':'')+viewMonth.month+'-01';
+  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
   document.getElementById('f-curr').value = curr;
-  var shared = getShared(curr);
-  document.getElementById('f-cat').innerHTML = shared.categories.map(function(c) {
-    return '<option value="'+c.name+'">'+c.name+'</option>';
-  }).join('');
+  document.getElementById('f-cat').innerHTML = DATA[curr].categories.map(c =>
+    `<option value="${c.name}">${c.name}</option>`
+  ).join('');
   document.getElementById('backdrop').classList.add('open');
   document.getElementById('sheet').classList.add('open');
-  setTimeout(function() { document.getElementById('f-amt').focus(); }, 350);
+  setTimeout(() => document.getElementById('f-amt').focus(), 350);
 }
+
 function closeSheet() {
   document.getElementById('backdrop').classList.remove('open');
   document.getElementById('sheet').classList.remove('open');
 }
+
 function setType(t) {
   entryType = t;
   document.getElementById('btn-exp').className = 'type-btn'+(t==='expense'?' exp':'');
-  document.getElementById('btn-inc').className  = 'type-btn'+(t==='income' ?' inc':'');
+  document.getElementById('btn-inc').className = 'type-btn'+(t==='income' ?' inc':'');
 }
+
 function submitEntry() {
-  var amount   = parseFloat(document.getElementById('f-amt').value);
-  var category = document.getElementById('f-cat').value;
-  var remark   = document.getElementById('f-rmk').value.trim();
-  var date     = document.getElementById('f-date').value;
-  var currency = document.getElementById('f-curr').value;
+  const amount   = parseFloat(document.getElementById('f-amt').value);
+  const category = document.getElementById('f-cat').value;
+  const remark   = document.getElementById('f-rmk').value.trim();
+  const date     = document.getElementById('f-date').value;
+  const currency = document.getElementById('f-curr').value;
   if (!amount || !date) { document.getElementById('f-amt').focus(); return; }
-  var entryMk = date.slice(0,7);
-  var txs = getTxs(currency, entryMk);
-  txs.unshift({date:date, amount:amount, category:category, remark:remark, type:entryType});
-  saveTxs(currency, entryMk, txs);
-  if (entryType === 'income') {
-    var shared = getShared(currency);
-    shared.income += amount;
-    saveShared(currency, shared);
-  }
+
+  const dateStr = date.slice(5).replace('-','/');
+  DATA[currency].txs.unshift({date:dateStr, amount, category, remark, type:entryType});
+  // expense category totals computed automatically via computeSpent() in render()
+  if (entryType === 'income') DATA[currency].income += amount;
+
   closeSheet();
-  if (currency===curr && entryMk===curMk()) render();
-  showToast(currency+' '+fmtD(amount)+' logged');
+  if (currency === curr) render();
+  showToast(`${currency} ${fmtD(amount)} logged`);
   document.getElementById('f-amt').value = '';
   document.getElementById('f-rmk').value = '';
 }
 
-
-// ── CAT SHEET ──────────────────────────────────────────────────
-var catSheetOpen = false;
-function toggleCatSheet() {
-  catSheetOpen = !catSheetOpen;
-  document.getElementById('cat-backdrop').classList.toggle('open', catSheetOpen);
-  document.getElementById('cat-sheet').classList.toggle('open', catSheetOpen);
-  document.getElementById('cat-edit-inline-btn').classList.toggle('active', catSheetOpen);
-  if (catSheetOpen) renderCatSheet();
-}
-function closeCatSheet() {
-  catSheetOpen = false;
-  document.getElementById('cat-backdrop').classList.remove('open');
-  document.getElementById('cat-sheet').classList.remove('open');
-  document.getElementById('cat-edit-inline-btn').classList.remove('active');
-}
-function renderCatSheet() {
-  var shared = getShared(curr);
-  document.getElementById('cat-sheet-list').innerHTML = shared.categories.map(function(c, i) {
-    return '<div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--border)">'+
-      '<div style="width:8px;height:8px;border-radius:50%;background:'+c.color+';flex-shrink:0"></div>'+
-      '<input class="inline-text-inp" value="'+c.name+'" onchange="renameCatSheet('+i+',this.value)" style="flex:1">'+
-      '<input class="inline-inp" type="number" value="'+c.budget+'" onchange="updateCatBgtSheet('+i+',this.value)" style="width:80px">'+
-      '<button style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:0 2px" onclick="delCatSheet('+i+')">&#215;</button>'+
-    '</div>';
-  }).join('');
-}
-function renameCatSheet(i, val) {
-  var shared = getShared(curr);
-  var oldName = shared.categories[i].name;
-  shared.categories[i].name = val;
-  saveShared(curr, shared);
-  Object.keys(_cache).forEach(function(k) {
-    if (k.indexOf('txs_'+curr+'_') === 0) {
-      var txs = _cache[k];
-      var changed = false;
-      txs.forEach(function(t) { if (t.category===oldName) { t.category=val; changed=true; } });
-      if (changed) { cacheSet(k, txs); pushToSheets(k, txs); }
-    }
-  });
-  render();
-}
-function updateCatBgtSheet(i, val) {
-  var shared = getShared(curr);
-  shared.categories[i].budget = parseFloat(val)||0;
-  saveShared(curr, shared);
-  render();
-}
-function delCatSheet(i) {
-  var shared = getShared(curr);
-  if (!confirm('Remove "'+shared.categories[i].name+'"?')) return;
-  shared.categories.splice(i,1);
-  saveShared(curr, shared);
-  render();
-  renderCatSheet();
-  showToast('Category removed');
-}
-function addCatFromSheet() {
-  var name = document.getElementById('cs-new-name').value.trim();
-  if (!name) { showToast('Enter a name', true); return; }
-  var budget = parseFloat(document.getElementById('cs-new-bgt').value)||0;
-  var palette = ['#3a7d5e','#b84040','#3a5c8a','#6b5090','#c07820','#7c5c38','#a04060','#2d7a8a','#5a7a3a','#8a6030'];
-  var shared = getShared(curr);
-  shared.categories.push({name:name, budget:budget, color:palette[shared.categories.length%palette.length], amount:0});
-  saveShared(curr, shared);
-  document.getElementById('cs-new-name').value = '';
-  document.getElementById('cs-new-bgt').value = '';
-  render();
-  renderCatSheet();
-  showToast('Category added');
-}
-
-// ── TX AMOUNT EDIT ─────────────────────────────────────────────
-var txEditIdx = -1;
-function openTxEdit(i) {
-  txEditIdx = i;
-  var key = curMk();
-  var txs = getTxs(curr, key);
-  var t = txs[i];
-  var shared = getShared(curr);
-  document.getElementById('txedit-amt').value = t.amount;
-  document.getElementById('txedit-rmk').value = t.remark||'';
-  document.getElementById('txedit-date').value = t.date||'';
-  document.getElementById('txedit-cat').innerHTML = shared.categories.map(function(c) {
-    return '<option value="'+c.name+'"'+(c.name===t.category?' selected':'')+'>'+c.name+'</option>';
-  }).join('');
-  document.getElementById('txedit-backdrop').classList.add('open');
-  document.getElementById('txedit-sheet').classList.add('open');
-  setTimeout(function() { document.getElementById('txedit-amt').focus(); }, 300);
-}
-function closeTxEdit() {
-  document.getElementById('txedit-backdrop').classList.remove('open');
-  document.getElementById('txedit-sheet').classList.remove('open');
-  txEditIdx = -1;
-}
-function saveTxEdit() {
-  if (txEditIdx < 0) return;
-  var key = curMk();
-  var txs = getTxs(curr, key);
-  var amt = parseFloat(document.getElementById('txedit-amt').value);
-  if (isNaN(amt) || amt <= 0) { document.getElementById('txedit-amt').focus(); return; }
-  txs[txEditIdx].amount   = amt;
-  txs[txEditIdx].category = document.getElementById('txedit-cat').value;
-  txs[txEditIdx].remark   = document.getElementById('txedit-rmk').value.trim();
-  txs[txEditIdx].date     = document.getElementById('txedit-date').value;
-  saveTxs(curr, key, txs);
-  closeTxEdit();
-  render();
-  showToast('Entry updated');
-}
-
 // ── INIT ──────────────────────────────────────────────────────
-pullFromSheets(function() { render(); });
+render();
 </script>
-
-<!-- CAT MANAGEMENT SHEET -->
-<div class="backdrop" id="cat-backdrop" onclick="closeCatSheet()"></div>
-<div class="sheet" id="cat-sheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-title">Categories</div>
-  <div id="cat-sheet-list"></div>
-  <div style="display:flex;gap:6px;margin-top:12px;border-top:0.5px solid var(--border);padding-top:12px">
-    <input class="form-input" type="text" id="cs-new-name" placeholder="New category name" style="flex:1;padding:10px 12px;font-size:14px">
-    <input class="form-input" type="number" id="cs-new-bgt" placeholder="Budget" style="width:90px;padding:10px 12px;font-size:14px">
-    <button class="add-btn" onclick="addCatFromSheet()">Add</button>
-  </div>
-</div>
-
-<!-- TX AMOUNT EDIT SHEET -->
-<div class="backdrop" id="txedit-backdrop" onclick="closeTxEdit()"></div>
-<div class="sheet" id="txedit-sheet">
-  <div class="sheet-handle"></div>
-  <div class="sheet-title">Edit entry</div>
-  <div class="form-group">
-    <label class="form-label">Amount</label>
-    <input class="form-input" type="number" inputmode="decimal" id="txedit-amt" placeholder="0.00">
-  </div>
-  <div class="form-group">
-    <label class="form-label">Category</label>
-    <select class="form-select" id="txedit-cat"></select>
-  </div>
-  <div class="form-group">
-    <label class="form-label">Remarks</label>
-    <input class="form-input" type="text" id="txedit-rmk" placeholder="remark">
-  </div>
-  <div class="form-group">
-    <label class="form-label">Date</label>
-    <input class="form-input" type="date" id="txedit-date">
-  </div>
-  <button class="submit-btn" onclick="saveTxEdit()">Save</button>
-</div>
 </body>
 </html>
