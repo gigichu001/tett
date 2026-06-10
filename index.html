@@ -481,7 +481,7 @@ function renderCats(d, spent) {
       <div class="cat-dot" style="background:${c.color}"></div>
       <div class="cat-name">${c.name}</div>
       <div class="cat-bar-wrap">
-        <div class="cat-mini-track"><div class="cat-mini-fill" style="width:${Math.min(pct,100)}%;background:${over?'#b84040':c.color}"></div></div>
+        <div class="cat-mini-track"><div class="cat-mini-fill" style="width:${leftPct.toFixed(1)}%;background:${over?'#b84040':c.color}"></div></div>
         <div class="cat-pct">${leftPct.toFixed(0)}% left</div>
       </div>
       <div class="cat-amount" style="color:${over?'#b84040':'var(--text)'}">${fmtD(c.amount)}</div>
