@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Finance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,13 +11,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
-  --bg:#f5f0e8; --bg2:#ede7d9; --bg3:#e4dccb;
-  --surface:#faf7f2; --surface2:#f0ebe0;
-  --border:rgba(100,80,50,0.12); --border2:rgba(100,80,50,0.22);
-  --text:#2c2416; --text2:#6b5c42; --text3:#a8947a;
-  --accent:#7c5c38; --accent2:#b08050;
-  --green:#3a7d5e; --amber:#c07820; --red:#b84040;
-  --r:14px; --r-sm:9px;
+  --bg:#f5f0e8;--bg2:#ede7d9;--bg3:#e4dccb;
+  --surface:#faf7f2;--surface2:#f0ebe0;
+  --border:rgba(100,80,50,0.12);--border2:rgba(100,80,50,0.22);
+  --text:#2c2416;--text2:#6b5c42;--text3:#a8947a;
+  --accent:#7c5c38;--accent2:#b08050;
+  --green:#3a7d5e;--amber:#c07820;--red:#b84040;
+  --r:14px;--r-sm:9px;
   --font-mono:'DM Mono',monospace;
   --font-head:'Lora',serif;
   --font-body:'DM Sans',sans-serif;
@@ -26,85 +25,66 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;padding-bottom:110px}
-
 .topbar{position:sticky;top:0;z-index:100;background:rgba(245,240,232,0.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:52px 20px 14px;display:flex;justify-content:space-between;align-items:flex-end;border-bottom:0.5px solid var(--border2)}
 .topbar-month{font-family:var(--font-head);font-size:22px;font-weight:600;color:var(--text)}
 .topbar-sub{font-family:var(--font-mono);font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
 .curr-toggle{display:flex;background:var(--bg3);border-radius:99px;padding:3px;gap:2px}
 .curr-btn{font-family:var(--font-mono);font-size:12px;padding:5px 14px;border-radius:99px;border:none;background:transparent;color:var(--text3);cursor:pointer;transition:all .2s}
 .curr-btn.active{background:var(--accent);color:#fff}
-
 .scroll{padding:18px 16px 0}
 .card{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r);padding:18px;margin-bottom:12px;box-shadow:var(--shadow)}
 .card-label{font-family:var(--font-mono);font-size:11px;color:var(--text3);letter-spacing:.09em;text-transform:uppercase;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
-
 .ov-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .ov-item{background:var(--surface2);border-radius:var(--r-sm);padding:14px;border:0.5px solid var(--border)}
 .ov-lbl{font-family:var(--font-mono);font-size:11px;color:var(--text3);letter-spacing:.06em;margin-bottom:6px}
-.ov-val{font-family:var(--font-mono);font-size:24px;font-weight:500;letter-spacing:-.02em;line-height:1}
+.ov-val{font-family:var(--font-mono);font-size:22px;font-weight:500;letter-spacing:-.02em;line-height:1}
 .ov-sub{font-size:11px;color:var(--text3);margin-top:4px}
-.ov-val.green{color:var(--green)} .ov-val.amber{color:var(--amber)} .ov-val.red{color:var(--red)}
-
+.ov-val.green{color:var(--green)}.ov-val.amber{color:var(--amber)}.ov-val.red{color:var(--red)}
 .prog-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px}
 .prog-pct{font-family:var(--font-mono);font-size:13px;font-weight:500}
 .prog-track{height:6px;background:var(--bg3);border-radius:99px;overflow:hidden}
 .prog-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
-
 .edit-btn{font-family:var(--font-mono);font-size:11px;color:var(--text3);background:none;border:0.5px solid var(--border2);border-radius:99px;padding:3px 10px;cursor:pointer;letter-spacing:.05em;transition:all .2s;flex-shrink:0}
 .edit-btn.on{color:var(--accent);border-color:var(--accent);background:rgba(124,92,56,.06)}
-
 .tabs{display:flex;gap:4px;background:var(--bg2);border-radius:var(--r-sm);padding:3px;margin-bottom:14px}
 .tab{flex:1;font-family:var(--font-body);font-size:13px;padding:7px 0;border-radius:6px;border:none;background:transparent;color:var(--text3);cursor:pointer;transition:all .2s}
 .tab.active{background:var(--surface);color:var(--text);font-weight:500;border:0.5px solid var(--border2)}
-
 .leg{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 .leg-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)}
 .leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .chart-wrap{position:relative;width:100%}
-
 .cat-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:0.5px solid var(--border)}
 .cat-row:last-child{border-bottom:none}
 .cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .cat-name{font-size:14px;color:var(--text);flex:1}
-.cat-bar-wrap{width:56px}
+.cat-bar-wrap{width:72px}
 .cat-mini-track{height:3px;background:var(--bg3);border-radius:99px;overflow:hidden}
 .cat-mini-fill{height:100%;border-radius:99px}
-.cat-pct{font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-top:2px;text-align:right}
+.cat-left-amt{font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-top:2px;text-align:right}
 .cat-amount{font-family:var(--font-mono);font-size:14px;font-weight:500;min-width:62px;text-align:right}
 .del-btn{background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0;display:none}
 .edit-mode .del-btn{display:block}
-
 .inline-inp{background:var(--bg2);border:0.5px solid var(--border2);border-radius:6px;padding:4px 6px;font-family:var(--font-mono);font-size:13px;color:var(--text);outline:none;width:72px;text-align:right}
 .inline-inp:focus{border-color:var(--accent2)}
 .inline-text-inp{background:var(--bg2);border:0.5px solid var(--border2);border-radius:6px;padding:4px 6px;font-family:var(--font-body);font-size:13px;color:var(--text);outline:none;flex:1;min-width:60px}
 .inline-text-inp:focus{border-color:var(--accent2)}
-
-/* cat edit row layout */
-.cat-edit-fields{display:flex;flex-direction:column;gap:5px;flex:1}
-.cat-edit-row2{display:flex;gap:5px;align-items:center}
-.cat-edit-lbl{font-family:var(--font-mono);font-size:10px;color:var(--text3);letter-spacing:.05em;flex-shrink:0}
-.cat-edit-spent{font-family:var(--font-mono);font-size:12px;color:var(--text2);padding:4px 6px;min-width:52px}
-
 .add-row{display:none;flex-wrap:wrap;gap:6px;padding:10px 0;border-top:0.5px solid var(--border)}
 .add-row.show{display:flex}
 .add-inp{background:var(--bg2);border:0.5px solid var(--border2);border-radius:6px;padding:7px 9px;font-family:var(--font-body);font-size:13px;color:var(--text);outline:none;flex:1;min-width:60px}
 .add-inp:focus{border-color:var(--accent2)}
 .add-sel{background:var(--bg2);border:0.5px solid var(--border2);border-radius:6px;padding:7px 9px;font-family:var(--font-body);font-size:13px;color:var(--text);outline:none;cursor:pointer}
 .add-btn{background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:13px;padding:7px 14px;cursor:pointer;font-family:var(--font-body);white-space:nowrap}
-
 .sav-row{padding:12px 0;border-bottom:0.5px solid var(--border)}
 .sav-row:last-child{border-bottom:none}
 .sav-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
 .sav-title{font-size:14px;color:var(--text);font-weight:500}
 .sav-period{font-size:11px;color:var(--text3);margin-top:2px}
 .sav-nums{font-family:var(--font-mono);font-size:12px;color:var(--text2);text-align:right}
-.sav-pct-lbl{font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-top:4px;text-align:right}
-
 .tx-hdr-btn{width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:none;color:var(--text2);cursor:pointer;padding:0;font-family:var(--font-body);font-size:13px}
 .tx-icon{font-size:16px;color:var(--text3);transition:transform .3s;display:inline-block}
 .tx-icon.open{transform:rotate(180deg)}
 .tx-list{overflow:hidden;max-height:0;transition:max-height .35s cubic-bezier(.4,0,.2,1)}
-.tx-list.open{max-height:800px;overflow-y:auto}
+.tx-list.open{max-height:1200px;overflow-y:auto}
 .tx-row{display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-top:0.5px solid var(--border)}
 .tx-date{font-family:var(--font-mono);font-size:11px;color:var(--text3);min-width:44px;padding-top:2px}
 .tx-info{flex:1}
@@ -113,7 +93,9 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .tx-right{display:flex;align-items:center;gap:6px}
 .tx-amount{font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--red);white-space:nowrap}
 .tx-amount.inc{color:var(--green)}
-
+/* filter bar */
+.filter-bar{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0;border-top:0.5px solid var(--border)}
+.filter-sel{background:var(--bg2);border:0.5px solid var(--border2);border-radius:6px;padding:5px 8px;font-family:var(--font-body);font-size:12px;color:var(--text);outline:none;cursor:pointer;flex:1;min-width:80px}
 .form-group{margin-bottom:12px}
 .form-label{font-family:var(--font-mono);font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:5px}
 .form-input,.form-select{width:100%;background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r-sm);padding:12px 14px;color:var(--text);font-size:16px;font-family:var(--font-body);outline:none;-webkit-appearance:none;appearance:none}
@@ -124,41 +106,34 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .type-btn.inc{background:rgba(58,125,94,.1);color:var(--green);border-color:rgba(58,125,94,.25)}
 .submit-btn{width:100%;padding:15px;background:var(--accent);border:none;border-radius:var(--r-sm);color:#fff;font-size:16px;font-weight:600;font-family:var(--font-body);cursor:pointer;margin-top:6px}
 .submit-btn:active{opacity:.85}
-
 .fab{position:fixed;bottom:28px;right:20px;width:56px;height:56px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(124,92,56,.35);z-index:200;transition:transform .15s}
 .fab:active{transform:scale(.93)}
-
 .backdrop{display:none;position:fixed;inset:0;background:rgba(44,36,22,.45);backdrop-filter:blur(4px);z-index:300}
 .backdrop.open{display:block}
 .sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:430px;background:var(--surface);border-radius:20px 20px 0 0;border-top:1px solid var(--border2);padding:16px 20px 48px;z-index:400;transition:transform .35s cubic-bezier(.32,.72,0,1)}
 .sheet.open{transform:translateX(-50%) translateY(0)}
 .sheet-handle{width:36px;height:4px;background:var(--bg3);border-radius:99px;margin:0 auto 18px}
 .sheet-title{font-family:var(--font-head);font-size:18px;font-weight:600;margin-bottom:18px;color:var(--text)}
-
 .toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-12px);background:var(--surface);border:0.5px solid var(--green);color:var(--green);font-family:var(--font-mono);font-size:13px;padding:10px 20px;border-radius:99px;opacity:0;transition:all .3s;z-index:500;white-space:nowrap;box-shadow:var(--shadow)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
 .edit-panel{background:var(--bg2);border-radius:var(--r-sm);padding:14px;margin-bottom:12px;border:0.5px solid var(--border)}
 .ep-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
 </style>
 </head>
 <body>
-
 <div class="toast" id="toast"></div>
-
 <div class="topbar">
   <div>
     <div class="topbar-sub">Finance</div>
-    <div class="topbar-month">June 2026</div>
+    <div class="topbar-month" id="topbar-month">June 2026</div>
   </div>
   <div class="curr-toggle">
     <button class="curr-btn active" onclick="setCurrency('SGD')">SGD</button>
     <button class="curr-btn" onclick="setCurrency('HKD')">HKD</button>
   </div>
 </div>
-
 <div class="scroll">
-
+  <!-- OVERVIEW -->
   <div class="card">
     <div class="card-label">
       <span>Overview</span>
@@ -167,9 +142,9 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
     <div id="ov-edit-panel" style="display:none">
       <div class="edit-panel">
         <div class="ep-grid">
-          <div><div class="form-label">Budget</div><input class="form-input" type="number" id="ov-budget-inp" style="padding:8px 10px;font-size:15px"></div>
-          <div><div class="form-label">Income</div><input class="form-input" type="number" id="ov-income-inp" style="padding:8px 10px;font-size:15px"></div>
-          <div><div class="form-label">Savings balance</div><input class="form-input" type="number" id="ov-savings-inp" style="padding:8px 10px;font-size:15px"></div>
+          <div><div class="form-label">Budget (<span id="ov-edit-curr-lbl">SGD</span>)</div><input class="form-input" type="number" id="ov-budget-inp" style="padding:8px 10px;font-size:15px"></div>
+          <div><div class="form-label">Income (<span id="ov-edit-curr-lbl2">SGD</span>)</div><input class="form-input" type="number" id="ov-income-inp" style="padding:8px 10px;font-size:15px"></div>
+          <div><div class="form-label">Savings bal (<span id="ov-edit-curr-lbl3">SGD</span>)</div><input class="form-input" type="number" id="ov-savings-inp" style="padding:8px 10px;font-size:15px"></div>
         </div>
         <button class="add-btn" style="width:100%;padding:9px" onclick="saveOv()">Save</button>
       </div>
@@ -178,12 +153,12 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
       <div class="ov-item">
         <div class="ov-lbl">Remaining</div>
         <div class="ov-val green" id="ov-remaining">—</div>
-        <div class="ov-sub" id="ov-curr-sub">SGD</div>
+        <div class="ov-sub" id="ov-curr-sub">budget − used</div>
       </div>
       <div class="ov-item">
-        <div class="ov-lbl">Current</div>
+        <div class="ov-lbl">Savings balance</div>
         <div class="ov-val" id="ov-savings-disp">—</div>
-        <div class="ov-sub" id="ov-savings-sub">SGD savings</div>
+        <div class="ov-sub" id="ov-savings-sub">SGD</div>
       </div>
     </div>
     <div class="prog-row">
@@ -193,6 +168,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
     <div class="prog-track"><div class="prog-fill" id="ov-bar" style="width:0%"></div></div>
   </div>
 
+  <!-- CHARTS -->
   <div class="card">
     <div class="tabs">
       <button class="tab active" onclick="switchTab('donut',this)">Category</button>
@@ -204,45 +180,58 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
     </div>
     <div id="tab-savings" style="display:none">
       <div id="sav-list"></div>
+      <button class="edit-btn" id="sav-btn" style="margin-top:10px" onclick="toggleSavEdit()">edit targets</button>
       <div id="sav-edit-panel" style="display:none;margin-top:12px">
         <div class="edit-panel" id="sav-edit-fields"></div>
       </div>
-      <button class="edit-btn" id="sav-btn" style="margin-top:10px" onclick="toggleSavEdit()">edit targets</button>
     </div>
   </div>
 
+  <!-- CATEGORIES -->
   <div class="card" id="cat-card">
     <div class="card-label">
-      <span>By category &middot; left</span>
+      <span>By category · left</span>
       <button class="edit-btn" id="cat-btn" onclick="toggleCatEdit()">edit</button>
     </div>
     <div id="cat-list"></div>
     <div class="add-row" id="cat-add-row">
       <input class="add-inp" type="text" id="cat-new-name" placeholder="Name">
-      <input class="add-inp" type="number" id="cat-new-bgt" placeholder="Budget" style="max-width:90px">
+      <input class="add-inp" type="text" id="cat-new-emoji" placeholder="Emoji" style="max-width:56px">
+      <input class="add-inp" type="number" id="cat-new-bgt" placeholder="Budget (SGD)" style="max-width:100px">
       <button class="add-btn" onclick="addCat()">Add</button>
     </div>
   </div>
 
+  <!-- HISTORY -->
   <div class="card" id="tx-card">
     <button class="tx-hdr-btn" onclick="toggleTx()">
       <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--text3)">History</span>
       <span class="tx-icon" id="tx-icon">▾</span>
     </button>
+    <!-- filter bar always visible after open -->
+    <div class="filter-bar" id="filter-bar" style="display:none">
+      <select class="filter-sel" id="f-filter-cat" onchange="renderTxList(getSGDData())">
+        <option value="">All categories</option>
+      </select>
+      <select class="filter-sel" id="f-sort" onchange="renderTxList(getSGDData())">
+        <option value="date-desc">Date ↓</option>
+        <option value="date-asc">Date ↑</option>
+        <option value="amount-desc">Amount ↓</option>
+        <option value="amount-asc">Amount ↑</option>
+      </select>
+    </div>
     <div class="tx-list" id="tx-list"></div>
     <div class="add-row" id="tx-add-row">
-      <input class="add-inp" type="number" id="tx-new-amt" placeholder="Amount" style="max-width:90px">
+      <input class="add-inp" type="number" id="tx-new-amt" placeholder="Amount (in curr)" style="max-width:110px">
       <select class="add-sel" id="tx-new-cat"></select>
       <input class="add-inp" type="text" id="tx-new-rmk" placeholder="Remark">
       <input class="add-inp" type="date" id="tx-new-date" style="max-width:130px">
       <button class="add-btn" onclick="addTx()">Add</button>
     </div>
   </div>
-
 </div>
 
 <button class="fab" onclick="openSheet()">+</button>
-
 <div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet">
   <div class="sheet-handle"></div>
@@ -253,10 +242,10 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
   </div>
   <div class="form-group">
     <label class="form-label">Currency</label>
-    <select class="form-select" id="f-curr"><option value="SGD">SGD</option><option value="HKD">HKD</option></select>
+    <select class="form-select" id="f-curr" onchange="updateSheetCatList()"><option value="SGD">SGD</option><option value="HKD">HKD</option></select>
   </div>
   <div class="form-group">
-    <label class="form-label">Amount</label>
+    <label class="form-label">Amount (in selected currency)</label>
     <input class="form-input" type="number" inputmode="decimal" id="f-amt" placeholder="0.00">
   </div>
   <div class="form-group">
@@ -275,54 +264,84 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 </div>
 
 <script>
-// ── DATA ──────────────────────────────────────────────────────
-// Categories store only budget + color.
-// Spent amounts are ALWAYS derived from txs via computeSpentMap() — never stored.
-const DATA = {
-  SGD: {
-    budget: 4178, income: 4662.27,
-    categories: [
-      {name:'Living',     budget:1450, color:'#3a7d5e'},
-      {name:'Loans',      budget:528,  color:'#b84040'},
-      {name:'Eat out',    budget:300,  color:'#3a5c8a'},
-      {name:'Leisure',    budget:100,  color:'#6b5090'},
-      {name:'Transport',  budget:80,   color:'#c07820'},
-      {name:'Grocery',    budget:400,  color:'#7c5c38'},
-      {name:'Consumption',budget:50,   color:'#a04060'},
-    ],
-    savingsBalance: 4662,
-    savings: {monthTarget:800, monthActual:400, yearTarget:8000, yearActual:2600},
-    txs: [
-      {date:'06/03',amount:12.8, category:'Eat out',    remark:'lunch',        type:'expense'},
-      {date:'06/02',amount:89,   category:'Leisure',    remark:'hle clothesx2',type:'expense'},
-      {date:'06/02',amount:7.6,  category:'Consumption',remark:'food scale',   type:'expense'},
-      {date:'06/02',amount:104.8,category:'Grocery',    remark:'donki',        type:'expense'},
-      {date:'06/15',amount:1400, category:'Living',     remark:'rent',         type:'expense'},
-      {date:'06/02',amount:528,  category:'Loans',      remark:'just need',    type:'expense'},
-      {date:'06/02',amount:80,   category:'Transport',  remark:'just need',    type:'expense'},
-      {date:'06/02',amount:10.7, category:'Eat out',    remark:'donki',        type:'expense'},
-      {date:'06/01',amount:30.7, category:'Eat out',    remark:'sushiro',      type:'expense'},
-    ]
-  },
-  HKD: {
-    budget: 32000, income: 49668,
-    categories: [
-      {name:'Living',   budget:9000, color:'#3a7d5e'},
-      {name:'Loans',    budget:4100, color:'#b84040'},
-      {name:'Eat out',  budget:2000, color:'#3a5c8a'},
-      {name:'Leisure',  budget:1500, color:'#6b5090'},
-      {name:'Transport',budget:800,  color:'#c07820'},
-      {name:'Grocery',  budget:2000, color:'#7c5c38'},
-    ],
-    savingsBalance: 49668,
-    savings: {monthTarget:6000, monthActual:3000, yearTarget:60000, yearActual:18000},
-    txs: [
-      {date:'06/15',amount:8000,category:'Living',  remark:'rent',        type:'expense'},
-      {date:'06/02',amount:380, category:'Grocery', remark:'supermarket', type:'expense'},
-      {date:'06/01',amount:240, category:'Eat out', remark:'sushiro',     type:'expense'},
-    ]
-  }
+// ── CONSTANTS ─────────────────────────────────────────────────
+const SGD_TO_HKD = 6.1;
+
+// ── EMOJI MAP ─────────────────────────────────────────────────
+// Default emojis for known category names (case-insensitive match)
+const EMOJI_MAP = {
+  'living':'🏠','rent':'🏠','housing':'🏠',
+  'loans':'💳','loan':'💳','debt':'💳',
+  'eat out':'🍜','food':'🍜','dining':'🍜','restaurant':'🍜',
+  'leisure':'🎮','entertainment':'🎮','fun':'🎮',
+  'transport':'🚇','transportation':'🚇','mrt':'🚇','bus':'🚇','taxi':'🚇',
+  'grocery':'🛒','groceries':'🛒','supermarket':'🛒',
+  'consumption':'🛍️','shopping':'🛍️','clothes':'🛍️',
+  'health':'💊','medical':'💊','gym':'🏋️',
+  'travel':'✈️','holiday':'✈️',
+  'savings':'💰','investment':'📈',
+  'utilities':'💡','bills':'💡',
+  'education':'📚','school':'📚',
 };
+function getEmoji(name, customEmoji) {
+  if (customEmoji) return customEmoji;
+  const key = (name||'').toLowerCase().trim();
+  return EMOJI_MAP[key] || '📦';
+}
+
+// ── DEFAULT DATA (SGD base, used only on first load) ──────────
+// All monetary values stored in SGD. HKD = SGD * 6.1
+const DEFAULT_DATA = {
+  budgetSGD: 4178,
+  incomeSGD: 4662.27,
+  savingsBalanceSGD: 4662,
+  savings: {
+    monthTargetSGD: 800, monthActualSGD: 400,
+    yearTargetSGD: 8000, yearActualSGD: 2600
+  },
+  categories: [
+    {name:'Eat out',  emoji:'🍜', budgetSGD:300,  color:'#3a5c8a'},
+    {name:'Grocery',  emoji:'🛒', budgetSGD:400,  color:'#7c5c38'},
+    {name:'Leisure',  emoji:'🎮', budgetSGD:100,  color:'#6b5090'},
+    {name:'Living',   emoji:'🏠', budgetSGD:1450, color:'#3a7d5e'},
+    {name:'Loans',    emoji:'💳', budgetSGD:528,  color:'#b84040'},
+    {name:'Consumption',emoji:'🛍️',budgetSGD:50,  color:'#a04060'},
+    {name:'Transport',emoji:'🚇', budgetSGD:80,   color:'#c07820'},
+  ],
+  // txs stored with amountSGD; date as MM/DD string; type expense|income
+  txs: [
+    {date:'06/03',amountSGD:12.8,  category:'Eat out',    remark:'lunch',         type:'expense'},
+    {date:'06/02',amountSGD:89,    category:'Leisure',    remark:'hle clothesx2', type:'expense'},
+    {date:'06/02',amountSGD:7.6,   category:'Consumption',remark:'food scale',    type:'expense'},
+    {date:'06/02',amountSGD:104.8, category:'Grocery',    remark:'donki',         type:'expense'},
+    {date:'06/15',amountSGD:1400,  category:'Living',     remark:'rent',          type:'expense'},
+    {date:'06/02',amountSGD:528,   category:'Loans',      remark:'just need',     type:'expense'},
+    {date:'06/02',amountSGD:80,    category:'Transport',  remark:'just need',     type:'expense'},
+    {date:'06/02',amountSGD:10.7,  category:'Eat out',    remark:'donki',         type:'expense'},
+    {date:'06/01',amountSGD:30.7,  category:'Eat out',    remark:'sushiro',       type:'expense'},
+  ]
+};
+
+// ── LOCALSTORAGE ──────────────────────────────────────────────
+const LS_KEY = 'finance_v3';
+function saveData() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(STATE)); } catch(e){}
+}
+function loadData() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e){}
+  return null;
+}
+
+// ── STATE (single SGD-based source of truth) ──────────────────
+let STATE = loadData() || JSON.parse(JSON.stringify(DEFAULT_DATA));
+// ensure categories always sorted ABC
+function sortCats() {
+  STATE.categories.sort((a,b) => a.name.localeCompare(b.name));
+}
+sortCats();
 
 let curr = 'SGD';
 let entryType = 'expense';
@@ -332,6 +351,13 @@ let catEditMode = false;
 let ovEditOpen = false;
 let savEditOpen = false;
 
+// ── CONVERSION HELPERS ────────────────────────────────────────
+function toDisp(sgdVal) {
+  return curr === 'SGD' ? sgdVal : sgdVal * SGD_TO_HKD;
+}
+function toSGD(val) {
+  return curr === 'SGD' ? val : val / SGD_TO_HKD;
+}
 const fmt  = n => Number(n).toLocaleString('en',{maximumFractionDigits:0});
 const fmtD = n => Number(n).toLocaleString('en',{minimumFractionDigits:1,maximumFractionDigits:1});
 
@@ -340,7 +366,6 @@ function usedColor(pct) {
   if (pct >= 70) return '#c07820';
   return '#7c5c38';
 }
-
 function showToast(msg, isErr) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -350,60 +375,65 @@ function showToast(msg, isErr) {
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-// FIX 1: Returns {catName: total} map — does NOT mutate category objects.
-// New categories with 0 transactions correctly show 0 without any zeroing bug.
-function computeSpentMap(d) {
-  const map = {};
-  d.txs.forEach(t => {
-    if (t.type === 'expense') {
-      map[t.category] = (map[t.category] || 0) + t.amount;
-    }
-  });
-  return map;
+// Returns display-currency values for a category
+function catSpentSGD(cat) {
+  return STATE.txs.filter(t => t.type==='expense' && t.category===cat.name)
+                  .reduce((s,t) => s + t.amountSGD, 0);
 }
 
+// getSGDData — returns STATE (used as arg for render fns, keeps interface clean)
+function getSGDData() { return STATE; }
+
+// ── CORE RENDER ───────────────────────────────────────────────
 function render() {
-  const d = DATA[curr];
-  const spentMap = computeSpentMap(d);
-  // Attach derived amounts (read-only) for rendering — not persisted
-  d.categories.forEach(c => { c.amount = spentMap[c.name] || 0; });
+  sortCats();
+  const totalSpentSGD = STATE.categories.reduce((s,c) => s + catSpentSGD(c), 0);
+  const totalSpent = toDisp(totalSpentSGD);
+  const budget = toDisp(STATE.budgetSGD);
+  const remaining = budget - totalSpent;
+  const usedPct = budget > 0 ? (totalSpent / budget * 100) : 0;
 
-  const spent = d.categories.reduce((s,c) => s + c.amount, 0);
-  const remaining = d.budget - spent;
-  const usedPct = d.budget > 0 ? (spent / d.budget * 100) : 0;
-
+  // Remaining = budget - used
   const remEl = document.getElementById('ov-remaining');
   remEl.textContent = fmtD(remaining);
-  remEl.className = 'ov-val ' + (remaining < 0 ? 'red' : remaining < d.budget * 0.15 ? 'amber' : 'green');
+  remEl.className = 'ov-val ' + (remaining < 0 ? 'red' : remaining < budget * 0.15 ? 'amber' : 'green');
+  document.getElementById('ov-curr-sub').textContent = curr + ' · budget − used';
 
-  document.getElementById('ov-savings-disp').textContent = fmt(d.savingsBalance || 0);
-  document.getElementById('ov-curr-sub').textContent = curr + ' remaining';
-  document.getElementById('ov-savings-sub').textContent = curr + ' savings';
+  // Savings balance
+  document.getElementById('ov-savings-disp').textContent = fmt(toDisp(STATE.savingsBalanceSGD));
+  document.getElementById('ov-savings-sub').textContent = curr + ' savings balance';
 
   const bar = document.getElementById('ov-bar');
   bar.style.width = Math.min(Math.max(usedPct, 0), 100) + '%';
   bar.style.background = usedColor(usedPct);
-  document.getElementById('ov-pct').textContent = usedPct.toFixed(1) + '% used';
+  document.getElementById('ov-pct').textContent = usedPct.toFixed(1) + '% used · ' + curr + ' ' + fmtD(totalSpent) + ' spent';
 
-  renderDonut(d, spent);
-  renderSavings(d);
-  renderCats(d, spent);
-  renderTxList(d);
+  renderDonut(totalSpent);
+  renderSavings();
+  renderCats(totalSpentSGD);
+  if (txOpen) renderTxList(STATE);
+  refreshFilterCatSel();
+  updateSheetCatList();
+  saveData();
 }
 
-function renderDonut(d, spent) {
-  document.getElementById('donut-leg').innerHTML = d.categories.map(c =>
-    `<div class="leg-item"><div class="leg-dot" style="background:${c.color}"></div>${c.name} ${spent>0?(c.amount/spent*100).toFixed(0):0}%</div>`
-  ).join('');
+// ── DONUT ─────────────────────────────────────────────────────
+function renderDonut(totalSpent) {
+  const cats = STATE.categories;
+  document.getElementById('donut-leg').innerHTML = cats.map(c => {
+    const sp = toDisp(catSpentSGD(c));
+    const pct = totalSpent > 0 ? (sp/totalSpent*100).toFixed(0) : 0;
+    return `<div class="leg-item"><div class="leg-dot" style="background:${c.color}"></div>${c.emoji||'📦'} ${c.name} ${pct}%</div>`;
+  }).join('');
 
   if (donutChart) donutChart.destroy();
   donutChart = new Chart(document.getElementById('donutChart'), {
     type:'doughnut',
     data:{
-      labels: d.categories.map(c=>c.name),
+      labels: cats.map(c=>c.name),
       datasets:[{
-        data: d.categories.map(c=>c.amount),
-        backgroundColor: d.categories.map(c=>c.color),
+        data: cats.map(c => toDisp(catSpentSGD(c))),
+        backgroundColor: cats.map(c=>c.color),
         borderWidth:3, borderColor:'#faf7f2', hoverBorderColor:'#faf7f2'
       }]
     },
@@ -411,317 +441,338 @@ function renderDonut(d, spent) {
       responsive:true, maintainAspectRatio:false, cutout:'68%',
       plugins:{
         legend:{display:false},
-        tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${curr} ${fmtD(ctx.raw)} (${spent>0?(ctx.raw/spent*100).toFixed(1):0}%)`}}
+        tooltip:{callbacks:{label:ctx=>{
+          const sp=ctx.raw; const pct=totalSpent>0?(sp/totalSpent*100).toFixed(1):0;
+          return ` ${ctx.label}: ${curr} ${fmtD(sp)} (${pct}%)`;
+        }}}
       }
     }
   });
 }
 
-function renderSavings(d) {
-  const s = d.savings;
-  const mPct = s.monthTarget > 0 ? Math.min(s.monthActual/s.monthTarget*100,100).toFixed(0) : 0;
-  const yPct = s.yearTarget  > 0 ? Math.min(s.yearActual /s.yearTarget *100,100).toFixed(0) : 0;
+// ── SAVINGS ───────────────────────────────────────────────────
+function renderSavings() {
+  const s = STATE.savings;
+  const mA = toDisp(s.monthActualSGD), mT = toDisp(s.monthTargetSGD);
+  const yA = toDisp(s.yearActualSGD),  yT = toDisp(s.yearTargetSGD);
+  const mPct = mT > 0 ? Math.min(mA/mT*100,100).toFixed(0) : 0;
+  const yPct = yT > 0 ? Math.min(yA/yT*100,100).toFixed(0) : 0;
   const col = p => p>=100?'#3a7d5e':p>=50?'#3a5c8a':'#c07820';
 
   document.getElementById('sav-list').innerHTML = `
     <div class="sav-row">
       <div class="sav-hdr">
         <div><div class="sav-title">This month</div><div class="sav-period">${curr} · Jun 2026</div></div>
-        <div class="sav-nums">
-          <input class="inline-inp" type="number" value="${s.monthActual}" style="width:90px;font-size:15px" onchange="DATA['${curr}'].savings.monthActual=parseFloat(this.value)||0;renderSavings(DATA['${curr}'])">
-          <div style="margin-top:4px;font-size:11px;color:var(--text3)">target <input class="inline-inp" type="number" value="${s.monthTarget}" style="width:80px;font-size:11px" onchange="DATA['${curr}'].savings.monthTarget=parseFloat(this.value)||0;renderSavings(DATA['${curr}'])"></div>
-        </div>
+        <div class="sav-nums">${curr} ${fmtD(mA)} / ${fmtD(mT)}</div>
       </div>
       <div class="prog-track"><div class="prog-fill" style="width:${mPct}%;background:${col(mPct)}"></div></div>
-      <div class="sav-pct-lbl">${mPct}% of monthly target</div>
+      <div style="font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-top:4px;text-align:right">${mPct}% of monthly target</div>
     </div>
     <div class="sav-row">
       <div class="sav-hdr">
         <div><div class="sav-title">This year</div><div class="sav-period">${curr} · 2026</div></div>
-        <div class="sav-nums">
-          <input class="inline-inp" type="number" value="${s.yearActual}" style="width:90px;font-size:15px" onchange="DATA['${curr}'].savings.yearActual=parseFloat(this.value)||0;renderSavings(DATA['${curr}'])">
-          <div style="margin-top:4px;font-size:11px;color:var(--text3)">target <input class="inline-inp" type="number" value="${s.yearTarget}" style="width:80px;font-size:11px" onchange="DATA['${curr}'].savings.yearTarget=parseFloat(this.value)||0;renderSavings(DATA['${curr}'])"></div>
-        </div>
+        <div class="sav-nums">${curr} ${fmtD(yA)} / ${fmtD(yT)}</div>
       </div>
       <div class="prog-track"><div class="prog-fill" style="width:${yPct}%;background:${col(yPct)}"></div></div>
-      <div class="sav-pct-lbl">${yPct}% of yearly target</div>
+      <div style="font-family:var(--font-mono);font-size:11px;color:var(--text3);margin-top:4px;text-align:right">${yPct}% of yearly target</div>
     </div>`;
 }
 
-function renderCats(d, spent) {
-  document.getElementById('cat-list').innerHTML = d.categories.map((c,i) => {
-    const leftPct = c.budget>0 ? Math.max(0, (c.budget-c.amount)/c.budget*100) : 0;
-    const over = c.amount > c.budget && c.budget > 0;
+// ── CATEGORIES ────────────────────────────────────────────────
+function renderCats(totalSpentSGD) {
+  const totalSpent = toDisp(totalSpentSGD);
+  document.getElementById('cat-list').innerHTML = STATE.categories.map((c,i) => {
+    const spSGD = catSpentSGD(c);
+    const sp = toDisp(spSGD);
+    const budg = toDisp(c.budgetSGD);
+    const leftAmt = budg - sp;
+    const leftPct = budg > 0 ? Math.max(0, leftAmt/budg*100) : 0;
+    const over = sp > budg && budg > 0;
+    const barColor = over ? '#b84040' : (leftPct < 20 ? '#c07820' : c.color);
+    const emoji = c.emoji || getEmoji(c.name);
 
     if (catEditMode) {
-      // FIX 2: edit row shows name + spent (read-only) + EDITABLE budget input
-      return `<div class="cat-row" style="align-items:flex-start">
-        <button class="del-btn" onclick="delCat(${i})" style="display:block;margin-top:8px">×</button>
-        <div class="cat-dot" style="background:${c.color};margin-top:12px;flex-shrink:0"></div>
-        <div class="cat-edit-fields">
-          <input class="inline-text-inp" value="${c.name}" onchange="DATA['${curr}'].categories[${i}].name=this.value;render()">
-          <div class="cat-edit-row2">
-            <span class="cat-edit-lbl">spent</span>
-            <span class="cat-edit-spent">${fmtD(c.amount)}</span>
-            <span class="cat-edit-lbl">budget</span>
-            <input class="inline-inp" type="number" value="${c.budget}" style="width:80px" onchange="DATA['${curr}'].categories[${i}].budget=parseFloat(this.value)||0;render()">
-          </div>
-        </div>
+      return `<div class="cat-row">
+        <button class="del-btn" onclick="delCat(${i})" style="display:block">×</button>
+        <div class="cat-dot" style="background:${c.color}"></div>
+        <input class="inline-text-inp" value="${emoji}" onchange="STATE.categories[${i}].emoji=this.value;saveData();renderDonut(${totalSpent})" style="max-width:40px">
+        <input class="inline-text-inp" value="${c.name}" onchange="STATE.categories[${i}].name=this.value;saveData();render()">
+        <input class="inline-inp" type="number" value="${fmtD(budg)}" placeholder="Budget" onchange="STATE.categories[${i}].budgetSGD=toSGD(parseFloat(this.value)||0);saveData();render()" style="width:80px">
       </div>`;
     }
-
     return `<div class="cat-row">
       <button class="del-btn" onclick="delCat(${i})">×</button>
       <div class="cat-dot" style="background:${c.color}"></div>
-      <div class="cat-name">${c.name}</div>
+      <div class="cat-name">${emoji} ${c.name}</div>
       <div class="cat-bar-wrap">
-        <div class="cat-mini-track"><div class="cat-mini-fill" style="width:${leftPct.toFixed(1)}%;background:${over?'#b84040':c.color}"></div></div>
-        <div class="cat-pct">${leftPct.toFixed(0)}% left</div>
+        <div class="cat-mini-track"><div class="cat-mini-fill" style="width:${leftPct.toFixed(1)}%;background:${barColor}"></div></div>
+        <div class="cat-left-amt" style="color:${over?'#b84040':'var(--text3)'}">${over?'−':'+'}${fmtD(Math.abs(leftAmt))}</div>
       </div>
-      <div class="cat-amount" style="color:${over?'#b84040':'var(--text)'}">${fmtD(c.amount)}</div>
+      <div class="cat-amount" style="color:${over?'#b84040':'var(--text)'}">${fmtD(sp)}</div>
     </div>`;
   }).join('');
 
-  if (catEditMode) {
-    document.getElementById('cat-card').classList.add('edit-mode');
-  }
+  if (catEditMode) document.getElementById('cat-card').classList.add('edit-mode');
+  else document.getElementById('cat-card').classList.remove('edit-mode');
 }
 
-function renderTxList(d) {
+// ── HISTORY ───────────────────────────────────────────────────
+function parseDateVal(dateStr) {
+  // MM/DD → sortable number MMDD
+  if (!dateStr) return 0;
+  const parts = dateStr.split('/');
+  return parseInt(parts[0]||0)*100 + parseInt(parts[1]||0);
+}
+
+function renderTxList() {
   const list = document.getElementById('tx-list');
-  if (!d.txs.length) {
-    list.innerHTML = '<div style="padding:12px 0;color:var(--text3);font-size:13px;border-top:0.5px solid var(--border)">No entries yet</div>';
+  let txs = [...STATE.txs];
+
+  // filter by category
+  const catFilter = document.getElementById('f-filter-cat')?.value || '';
+  if (catFilter) txs = txs.filter(t => t.category === catFilter);
+
+  // sort
+  const sort = document.getElementById('f-sort')?.value || 'date-desc';
+  txs.sort((a,b) => {
+    if (sort === 'date-desc') return parseDateVal(b.date) - parseDateVal(a.date);
+    if (sort === 'date-asc')  return parseDateVal(a.date) - parseDateVal(b.date);
+    if (sort === 'amount-desc') return toDisp(b.amountSGD) - toDisp(a.amountSGD);
+    if (sort === 'amount-asc')  return toDisp(a.amountSGD) - toDisp(b.amountSGD);
+    return 0;
+  });
+
+  if (!txs.length) {
+    list.innerHTML = '<div style="padding:12px 0;color:var(--text3);font-size:13px;border-top:0.5px solid var(--border)">No entries</div>';
     return;
   }
-  list.innerHTML = d.txs.map((t,i) => {
-    if (txOpen && catEditMode) {
-      return `<div class="tx-row">
-        <div class="tx-date">${t.date}</div>
-        <div class="tx-info">
-          <input class="inline-text-inp" value="${t.category}" onchange="DATA['${curr}'].txs[${i}].category=this.value" style="margin-bottom:3px">
-          <input class="inline-text-inp" value="${t.remark}" onchange="DATA['${curr}'].txs[${i}].remark=this.value" placeholder="remark">
-        </div>
-        <div class="tx-right">
-          <input class="inline-inp" type="number" value="${t.amount}" onchange="DATA['${curr}'].txs[${i}].amount=parseFloat(this.value)||0;render()">
-          <button class="del-btn" onclick="delTx(${i})" style="display:block">×</button>
-        </div>
-      </div>`;
-    }
+
+  // find original index for delete
+  list.innerHTML = txs.map(t => {
+    const origIdx = STATE.txs.indexOf(t);
+    const dispAmt = toDisp(t.amountSGD);
     return `<div class="tx-row">
       <div class="tx-date">${t.date}</div>
       <div class="tx-info">
-        <div class="tx-cat">${t.category}</div>
-        <div class="tx-remark">${t.remark}</div>
+        <div class="tx-cat">${getCatEmoji(t.category)} ${t.category}</div>
+        <div class="tx-remark">${t.remark||''}</div>
       </div>
       <div class="tx-right">
-        <div class="tx-amount ${t.type==='income'?'inc':''}">${t.type==='income'?'+':'-'}${fmtD(t.amount)}</div>
-        <button class="del-btn" onclick="delTx(${i})" style="display:block">×</button>
+        <div class="tx-amount ${t.type==='income'?'inc':''}">${t.type==='income'?'+':'-'}${fmtD(dispAmt)}</div>
+        <button class="del-btn" onclick="delTx(${origIdx})" style="display:block">×</button>
       </div>
     </div>`;
   }).join('');
+
+  // always show delete btns in history
+  document.getElementById('tx-card').classList.add('edit-mode');
 }
 
+function getCatEmoji(catName) {
+  const c = STATE.categories.find(c=>c.name===catName);
+  return c ? (c.emoji||getEmoji(c.name)) : '📦';
+}
+
+function refreshFilterCatSel() {
+  const sel = document.getElementById('f-filter-cat');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All categories</option>' +
+    STATE.categories.map(c=>`<option value="${c.name}" ${c.name===cur?'selected':''}>${c.emoji||'📦'} ${c.name}</option>`).join('');
+}
+
+// ── CURRENCY ──────────────────────────────────────────────────
 function setCurrency(c) {
-  catEditMode = false;
-  ovEditOpen = false;
-  savEditOpen = false;
-  document.getElementById('ov-edit-panel').style.display = 'none';
-  document.getElementById('ov-btn').classList.remove('on');
-  document.getElementById('ov-btn').textContent = 'edit';
-  document.getElementById('sav-edit-panel').style.display = 'none';
-  document.getElementById('sav-btn').classList.remove('on');
-  document.getElementById('sav-btn').textContent = 'edit targets';
-  document.getElementById('cat-card').classList.remove('edit-mode');
-  document.getElementById('cat-btn').classList.remove('on');
-  document.getElementById('cat-btn').textContent = 'edit';
-  document.getElementById('cat-add-row').classList.remove('show');
-  document.getElementById('tx-card').classList.remove('edit-mode');
   curr = c;
-  document.querySelectorAll('.curr-btn').forEach(b => b.classList.toggle('active', b.textContent === c));
+  document.querySelectorAll('.curr-btn').forEach(b => b.classList.toggle('active', b.textContent===c));
   document.getElementById('f-curr').value = c;
   render();
 }
 
+// ── TABS ──────────────────────────────────────────────────────
 function switchTab(name, btn) {
   ['donut','savings'].forEach(t => document.getElementById('tab-'+t).style.display = t===name?'':'none');
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
 
+// ── OVERVIEW EDIT ─────────────────────────────────────────────
 function toggleOvEdit() {
   ovEditOpen = !ovEditOpen;
   document.getElementById('ov-edit-panel').style.display = ovEditOpen ? 'block' : 'none';
   document.getElementById('ov-btn').classList.toggle('on', ovEditOpen);
   document.getElementById('ov-btn').textContent = ovEditOpen ? 'done' : 'edit';
+  // labels show current currency
+  ['ov-edit-curr-lbl','ov-edit-curr-lbl2','ov-edit-curr-lbl3'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.textContent=curr;
+  });
   if (ovEditOpen) {
-    const d = DATA[curr];
-    document.getElementById('ov-budget-inp').value = d.budget;
-    document.getElementById('ov-income-inp').value = d.income;
-    document.getElementById('ov-savings-inp').value = d.savingsBalance || 0;
+    document.getElementById('ov-budget-inp').value  = fmtD(toDisp(STATE.budgetSGD));
+    document.getElementById('ov-income-inp').value  = fmtD(toDisp(STATE.incomeSGD));
+    document.getElementById('ov-savings-inp').value = fmtD(toDisp(STATE.savingsBalanceSGD));
   }
 }
-
 function saveOv() {
-  const d = DATA[curr];
   const b   = parseFloat(document.getElementById('ov-budget-inp').value);
   const inc = parseFloat(document.getElementById('ov-income-inp').value);
-  if (!isNaN(b))   d.budget = b;
-  if (!isNaN(inc)) d.income = inc;
   const sav = parseFloat(document.getElementById('ov-savings-inp').value);
-  if (!isNaN(sav)) d.savingsBalance = sav;
+  if (!isNaN(b))   STATE.budgetSGD          = toSGD(b);
+  if (!isNaN(inc)) STATE.incomeSGD          = toSGD(inc);
+  if (!isNaN(sav)) STATE.savingsBalanceSGD  = toSGD(sav);
   toggleOvEdit();
   render();
   showToast('Overview updated');
 }
 
+// ── CAT EDIT ──────────────────────────────────────────────────
 function toggleCatEdit() {
   catEditMode = !catEditMode;
   document.getElementById('cat-btn').classList.toggle('on', catEditMode);
   document.getElementById('cat-btn').textContent = catEditMode ? 'done' : 'edit';
   document.getElementById('cat-add-row').classList.toggle('show', catEditMode);
-  document.getElementById('cat-card').classList.toggle('edit-mode', catEditMode);
-  document.getElementById('tx-card').classList.toggle('edit-mode', catEditMode);
   render();
 }
-
 function delCat(i) {
-  if (!confirm('Remove "' + DATA[curr].categories[i].name + '"?')) return;
-  DATA[curr].categories.splice(i, 1);
-  render();
+  if (!confirm('Remove "' + STATE.categories[i].name + '"?')) return;
+  STATE.categories.splice(i, 1);
+  saveData(); render();
   showToast('Category removed');
 }
-
 function addCat() {
   const name = document.getElementById('cat-new-name').value.trim();
   if (!name) { showToast('Enter a category name', true); return; }
-  // FIX 1 (add form): removed "Spent" field — new category starts at 0 from txs.
-  // Only budget is needed here.
-  const budget = parseFloat(document.getElementById('cat-new-bgt').value) || 0;
+  const emojiInput = document.getElementById('cat-new-emoji').value.trim();
+  const budgetDisp = parseFloat(document.getElementById('cat-new-bgt').value) || 0;
+  const emoji = emojiInput || getEmoji(name);
   const palette = ['#3a7d5e','#b84040','#3a5c8a','#6b5090','#c07820','#7c5c38','#a04060','#2d7a8a','#5a7a3a','#8a6030'];
-  const color = palette[DATA[curr].categories.length % palette.length];
-  DATA[curr].categories.push({name, budget, color});
-  document.getElementById('cat-new-name').value = '';
-  document.getElementById('cat-new-bgt').value  = '';
-  render();
-  showToast('Category added — log a transaction to see spending');
+  const color = palette[STATE.categories.length % palette.length];
+  STATE.categories.push({name, emoji, budgetSGD: toSGD(budgetDisp), color});
+  sortCats();
+  document.getElementById('cat-new-name').value  = '';
+  document.getElementById('cat-new-emoji').value = '';
+  document.getElementById('cat-new-bgt').value   = '';
+  saveData(); render();
+  // refresh tx add dropdown
+  refreshTxCatSel();
+  showToast('Category added');
 }
 
+// ── SAVINGS EDIT ──────────────────────────────────────────────
 function toggleSavEdit() {
   savEditOpen = !savEditOpen;
   document.getElementById('sav-edit-panel').style.display = savEditOpen ? 'block' : 'none';
   document.getElementById('sav-btn').classList.toggle('on', savEditOpen);
   document.getElementById('sav-btn').textContent = savEditOpen ? 'done' : 'edit targets';
   if (savEditOpen) {
-    const s = DATA[curr].savings;
+    const s = STATE.savings;
     document.getElementById('sav-edit-fields').innerHTML = `
       <div class="ep-grid">
-        <div><div class="form-label">Month target</div><input class="form-input" type="number" id="sav-mt" value="${s.monthTarget}" style="padding:8px 10px;font-size:14px"></div>
-        <div><div class="form-label">Month actual</div><input class="form-input" type="number" id="sav-ma" value="${s.monthActual}" style="padding:8px 10px;font-size:14px"></div>
-        <div><div class="form-label">Year target</div><input class="form-input" type="number" id="sav-yt" value="${s.yearTarget}" style="padding:8px 10px;font-size:14px"></div>
-        <div><div class="form-label">Year actual</div><input class="form-input" type="number" id="sav-ya" value="${s.yearActual}" style="padding:8px 10px;font-size:14px"></div>
+        <div><div class="form-label">Month target (${curr})</div><input class="form-input" type="number" id="sav-mt" value="${fmtD(toDisp(s.monthTargetSGD))}" style="padding:8px 10px;font-size:14px"></div>
+        <div><div class="form-label">Month actual (${curr})</div><input class="form-input" type="number" id="sav-ma" value="${fmtD(toDisp(s.monthActualSGD))}" style="padding:8px 10px;font-size:14px"></div>
+        <div><div class="form-label">Year target (${curr})</div><input class="form-input" type="number" id="sav-yt" value="${fmtD(toDisp(s.yearTargetSGD))}" style="padding:8px 10px;font-size:14px"></div>
+        <div><div class="form-label">Year actual (${curr})</div><input class="form-input" type="number" id="sav-ya" value="${fmtD(toDisp(s.yearActualSGD))}" style="padding:8px 10px;font-size:14px"></div>
       </div>
       <button class="add-btn" style="width:100%;padding:9px;margin-top:2px" onclick="saveSavings()">Save</button>`;
   }
 }
-
 function saveSavings() {
-  const s = DATA[curr].savings;
+  const s = STATE.savings;
   const mt = parseFloat(document.getElementById('sav-mt').value);
   const ma = parseFloat(document.getElementById('sav-ma').value);
   const yt = parseFloat(document.getElementById('sav-yt').value);
   const ya = parseFloat(document.getElementById('sav-ya').value);
-  if (!isNaN(mt)) s.monthTarget = mt;
-  if (!isNaN(ma)) s.monthActual = ma;
-  if (!isNaN(yt)) s.yearTarget  = yt;
-  if (!isNaN(ya)) s.yearActual  = ya;
+  if (!isNaN(mt)) s.monthTargetSGD = toSGD(mt);
+  if (!isNaN(ma)) s.monthActualSGD = toSGD(ma);
+  if (!isNaN(yt)) s.yearTargetSGD  = toSGD(yt);
+  if (!isNaN(ya)) s.yearActualSGD  = toSGD(ya);
   toggleSavEdit();
-  render();
+  saveData(); render();
   showToast('Savings updated');
 }
 
+// ── HISTORY ───────────────────────────────────────────────────
 function toggleTx() {
   txOpen = !txOpen;
-  const list = document.getElementById('tx-list');
-  list.classList.toggle('open', txOpen);
+  document.getElementById('tx-list').classList.toggle('open', txOpen);
   document.getElementById('tx-icon').classList.toggle('open', txOpen);
   document.getElementById('tx-add-row').classList.toggle('show', txOpen);
+  document.getElementById('filter-bar').style.display = txOpen ? 'flex' : 'none';
   if (txOpen) {
     document.getElementById('tx-new-date').value = new Date().toISOString().split('T')[0];
     refreshTxCatSel();
-    renderTxList(DATA[curr]);
+    refreshFilterCatSel();
+    renderTxList();
   }
 }
-
 function refreshTxCatSel() {
-  document.getElementById('tx-new-cat').innerHTML = DATA[curr].categories.map(c =>
-    `<option value="${c.name}">${c.name}</option>`
-  ).join('');
+  const sel = document.getElementById('tx-new-cat');
+  sel.innerHTML = STATE.categories.map(c=>`<option value="${c.name}">${c.emoji||'📦'} ${c.name}</option>`).join('');
 }
-
 function delTx(i) {
-  const d = DATA[curr];
-  const t = d.txs[i];
-  if (t.type === 'income') d.income = Math.max(0, d.income - t.amount);
-  d.txs.splice(i, 1);
-  render();
+  STATE.txs.splice(i, 1);
+  saveData(); render();
   showToast('Entry removed');
 }
-
 function addTx() {
-  const amount  = parseFloat(document.getElementById('tx-new-amt').value);
+  const dispAmt = parseFloat(document.getElementById('tx-new-amt').value);
   const cat     = document.getElementById('tx-new-cat').value;
   const remark  = document.getElementById('tx-new-rmk').value.trim();
   const dateVal = document.getElementById('tx-new-date').value;
-  if (!amount || !dateVal) { showToast('Enter amount and date', true); return; }
+  if (!dispAmt || !dateVal) { showToast('Enter amount and date', true); return; }
   const dateStr = dateVal.slice(5).replace('-','/');
-  DATA[curr].txs.unshift({date:dateStr, amount, category:cat, remark, type:'expense'});
+  STATE.txs.unshift({date:dateStr, amountSGD:toSGD(dispAmt), category:cat, remark, type:'expense'});
   document.getElementById('tx-new-amt').value = '';
   document.getElementById('tx-new-rmk').value = '';
-  render();
-  showToast(`${curr} ${fmtD(amount)} added`);
+  saveData(); render();
+  showToast(`${curr} ${fmtD(dispAmt)} added`);
 }
 
+// ── LOG SHEET ─────────────────────────────────────────────────
 function openSheet() {
   document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
   document.getElementById('f-curr').value = curr;
-  document.getElementById('f-cat').innerHTML = DATA[curr].categories.map(c =>
-    `<option value="${c.name}">${c.name}</option>`
-  ).join('');
+  updateSheetCatList();
   document.getElementById('backdrop').classList.add('open');
   document.getElementById('sheet').classList.add('open');
   setTimeout(() => document.getElementById('f-amt').focus(), 350);
 }
-
 function closeSheet() {
   document.getElementById('backdrop').classList.remove('open');
   document.getElementById('sheet').classList.remove('open');
 }
-
+function updateSheetCatList() {
+  document.getElementById('f-cat').innerHTML = STATE.categories.map(c=>
+    `<option value="${c.name}">${c.emoji||'📦'} ${c.name}</option>`
+  ).join('');
+}
 function setType(t) {
   entryType = t;
   document.getElementById('btn-exp').className = 'type-btn'+(t==='expense'?' exp':'');
   document.getElementById('btn-inc').className = 'type-btn'+(t==='income' ?' inc':'');
 }
-
 function submitEntry() {
-  const amount   = parseFloat(document.getElementById('f-amt').value);
+  const dispAmt  = parseFloat(document.getElementById('f-amt').value);
   const category = document.getElementById('f-cat').value;
   const remark   = document.getElementById('f-rmk').value.trim();
   const date     = document.getElementById('f-date').value;
-  const currency = document.getElementById('f-curr').value;
-  if (!amount || !date) { document.getElementById('f-amt').focus(); return; }
+  const sheetCurr = document.getElementById('f-curr').value;
+  if (!dispAmt || !date) { document.getElementById('f-amt').focus(); return; }
 
   const dateStr = date.slice(5).replace('-','/');
-  DATA[currency].txs.unshift({date:dateStr, amount, category, remark, type:entryType});
-  if (entryType === 'income') DATA[currency].income += amount;
+  // convert to SGD based on sheet's selected currency
+  const amountSGD = sheetCurr === 'SGD' ? dispAmt : dispAmt / SGD_TO_HKD;
+
+  STATE.txs.unshift({date:dateStr, amountSGD, category, remark, type:entryType});
+  if (entryType === 'income') STATE.incomeSGD += amountSGD;
 
   closeSheet();
-  if (currency === curr) render();
-  showToast(`${currency} ${fmtD(amount)} logged`);
+  saveData(); render();
+  showToast(`${sheetCurr} ${fmtD(dispAmt)} logged`);
   document.getElementById('f-amt').value = '';
   document.getElementById('f-rmk').value = '';
 }
 
+// ── INIT ──────────────────────────────────────────────────────
 render();
 </script>
 </body>
