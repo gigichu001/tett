@@ -241,13 +241,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 
   <!-- ACCOUNTS -->
   <div class="card">
-    <div class="card-label"><span>Accounts</span><button class="edit-btn" onclick="openSettings('accounts')">manage</button></div>
+    <div class="card-label"><span>Assets · money you have</span><button class="edit-btn" onclick="openSettings('assets')">manage</button></div>
     <div id="acc-body"></div>
   </div>
 
   <!-- CARD BILLS -->
   <div class="card">
-    <div class="card-label"><span>Card bills · to pay</span></div>
+    <div class="card-label"><span>Liabilities · credit cards</span><button class="edit-btn" onclick="openSettings('liabilities')">manage</button></div>
     <div id="bill-body"></div>
   </div>
 
@@ -338,11 +338,12 @@ const LS_KEY = 'finance_app_v1';
 const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbyUaYtDRSrJMW5XYToytrRm4noB4r0GaX5ZAIEJ0pgqRg0fFDFlrRo1_GfYFZWJDGAr/exec';
 const TYPES = {
   bank:    {label:'Bank',        icon:'🏦'},
-  card:    {label:'Credit card', icon:'💳'},
+  card:    {label:'Credit card', icon:'💳'},  // liabilities; managed separately from assets
   cash:    {label:'Cash',        icon:'💵'},
   ewallet: {label:'E-wallet',    icon:'📱'},
   invest:  {label:'Investment',  icon:'📈'},
 };
+const ASSET_TYPES = Object.keys(TYPES).filter(k => k !== 'card');
 const PALETTE = ['#3a5c8a','#7c5c38','#6b5090','#3a7d5e','#b84040','#a04060','#c07820','#2d7a8a','#5a7a3a','#8a6030'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MONTHS_LONG = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -374,11 +375,11 @@ function seed() {
     accounts: [
       {id:'a_dbs',  name:'DBS Savings', type:'bank',   currency:'SGD', opening:5200,  dueDay:0},
       {id:'a_cash', name:'Cash',        type:'cash',   currency:'SGD', opening:150,   dueDay:0},
-      {id:'a_citi', name:'Citi Rewards',type:'card',   currency:'SGD', opening:-320,  dueDay:15},
-      {id:'a_uob',  name:'UOB One',     type:'card',   currency:'SGD', opening:0,     dueDay:25},
+      {id:'a_citi', name:'Citi Rewards',type:'card',   currency:'SGD', opening:-320,  dueDay:15, limit:8000},
+      {id:'a_uob',  name:'UOB One',     type:'card',   currency:'SGD', opening:0,     dueDay:25, limit:5000},
       {id:'a_hsbc', name:'HSBC Savings',type:'bank',   currency:'HKD', opening:12000, dueDay:0},
       {id:'a_oct',  name:'Octopus',     type:'ewallet',currency:'HKD', opening:80,    dueDay:0},
-      {id:'a_hsv',  name:'HSBC Visa',   type:'card',   currency:'HKD', opening:-1250, dueDay:8},
+      {id:'a_hsv',  name:'HSBC Visa',   type:'card',   currency:'HKD', opening:-1250, dueDay:8,  limit:30000},
       {id:'a_usd',  name:'Schwab',      type:'invest', currency:'USD', opening:800,   dueDay:0},
       {id:'a_ali',  name:'Alipay',      type:'ewallet',currency:'RMB', opening:1200,  dueDay:0},
       {id:'a_jpy',  name:'Yen cash',    type:'cash',   currency:'JPY', opening:50000, dueDay:0},
@@ -486,7 +487,7 @@ function save() {
 
 // ── GOOGLE SHEET SYNC ─────────────────────────────────────────
 // Each table is one tab in the sheet, matched by its key columns (same as the Apps Script).
-const TABLE_KEYS = {Settings:['key'], Currencies:['code'], Rates:['code','from_date'], Accounts:['id'], Categories:['id'],
+const TABLE_KEYS = {Settings:['key'], Currencies:['code'], Rates:['code','from_date'], Accounts:['id'], Cards:['id'], Categories:['id'],
                     Budgets:['category_id','currency'], SavingsTargets:['currency'], Transactions:['id']};
 let syncTimer = null, syncing = false, editVersion = 0, syncState = '', syncMsg = '', discArmed = false;
 
@@ -494,8 +495,11 @@ function toTables(s) {
   return {
     Settings: [{key:'base_currency', value:s.base}],
     Currencies: s.currencies.map(c => ({code:c.code, name:c.name, decimals:c.dec})),
-    Rates: s.rates.map(r => ({code:r.code, from_date:r.date, rate_per_1_SGD:r.rate})),
-    Accounts: s.accounts.map(a => ({id:a.id, name:a.name, type:a.type, currency:a.currency, opening_balance:a.opening, due_day:a.dueDay||0})),
+    Rates: s.rates.map(r => ({code:r.code, from_date:r.date, rate:r.rate})),
+    // Assets and credit cards live in separate tabs; inside the app a card is an account with type 'card'.
+    Accounts: s.accounts.filter(a => a.type !== 'card').map(a => ({id:a.id, name:a.name, type:a.type, currency:a.currency, opening_balance:a.opening})),
+    Cards: s.accounts.filter(a => a.type === 'card').map(a => ({id:a.id, name:a.name, currency:a.currency, owed_at_start:-a.opening || 0,
+                                                              credit_limit:a.limit || 0, due_day:a.dueDay || 0})),
     Categories: s.categories.map(c => ({id:c.id, name:c.name, emoji:c.emoji, kind:c.kind, color:c.color})),
     Budgets: s.budgets.map(b => ({category_id:b.catId, currency:b.currency, monthly:b.monthly||0, yearly:b.yearly||0})),
     SavingsTargets: s.savingsTargets.map(t => ({currency:t.currency, monthly:t.monthly||0, yearly:t.yearly||0})),
@@ -512,9 +516,12 @@ function fromTables(d) {
   return {
     version: 2, base,
     currencies: t('Currencies').filter(r => str(r.code)).map(r => ({code:str(r.code), name:str(r.name) || str(r.code), dec: str(r.decimals) === '' ? 2 : num(r.decimals)})),
-    rates: t('Rates').filter(r => str(r.code) && str(r.from_date)).map(r => ({code:str(r.code), date:str(r.from_date).slice(0,10), rate:num(r.rate_per_1_SGD)})),
-    accounts: t('Accounts').filter(r => str(r.id)).map(r => ({id:str(r.id), name:str(r.name) || str(r.id), type: TYPES[str(r.type)] ? str(r.type) : 'bank',
-                                                              currency:str(r.currency) || base, opening:num(r.opening_balance), dueDay:num(r.due_day)})),
+    rates: t('Rates').filter(r => str(r.code) && str(r.from_date)).map(r => ({code:str(r.code), date:str(r.from_date).slice(0,10),
+                                                                             rate: str(r.rate) !== '' ? num(r.rate) : num(r.rate_per_1_SGD)})),
+    accounts: t('Accounts').filter(r => str(r.id)).map(r => ({id:str(r.id), name:str(r.name) || str(r.id), type: ASSET_TYPES.includes(str(r.type)) ? str(r.type) : 'bank',
+                                                              currency:str(r.currency) || base, opening:num(r.opening_balance), dueDay:0, limit:0}))
+      .concat(t('Cards').filter(r => str(r.id)).map(r => ({id:str(r.id), name:str(r.name) || str(r.id), type:'card', currency:str(r.currency) || base,
+                                                          opening:-num(r.owed_at_start), dueDay:num(r.due_day), limit:num(r.credit_limit)}))),
     categories: t('Categories').filter(r => str(r.id)).map((r,i) => ({id:str(r.id), name:str(r.name) || str(r.id), emoji:str(r.emoji) || '📦',
                                                                      kind: str(r.kind) === 'income' ? 'income' : 'expense', color:str(r.color) || PALETTE[i % PALETTE.length]})),
     budgets: t('Budgets').filter(r => str(r.category_id) && str(r.currency)).map(r => ({catId:str(r.category_id), currency:str(r.currency), monthly:num(r.monthly), yearly:num(r.yearly)})),
@@ -547,6 +554,12 @@ async function api(ops) {
   if (!j.ok) throw new Error(j.error || 'The sheet returned an error');
   return j.data;
 }
+// Takes the sheet's data as the app's state.
+function adopt(data) {
+  S = fromTables(data); SYNCED = toTables(S);
+  // Older sheets kept rates in a rate_per_1_SGD column; re-send those rows so the rate column gets filled.
+  if ((data.Rates || []).some(r => r.rate === undefined || r.rate === '')) SYNCED.Rates = [];
+}
 function scheduleSync(ms) { clearTimeout(syncTimer); syncTimer = setTimeout(syncNow, ms == null ? 800 : ms); }
 // Sends pending changes, then takes the sheet's copy (so edits made in the sheet show up),
 // unless something was changed in the app while the request was out.
@@ -558,7 +571,7 @@ async function syncNow() {
   setSync('saving');
   try {
     const data = await api(ops);
-    if (editVersion === v) { S = fromTables(data); SYNCED = toTables(S); renderAll(true); }
+    if (editVersion === v) { adopt(data); renderAll(true); }
     else SYNCED = sent;
     setSync('ok');
   } catch (e) {
@@ -590,10 +603,11 @@ async function connect() {
   CONN = {url, key};
   try {
     const data = await api([]);
-    S = fromTables(data); SYNCED = toTables(S);
+    adopt(data);
     UI.budgetScope = 'ALL'; UI.histCat = ''; UI.histAcc = '';
     if (!cur(UI.disp)) UI.disp = S.base;
     renderAll(true); setSync('ok'); renderSettings();
+    if (diffOps().length) scheduleSync();
     showToast('Connected. Your sheet data is loaded.');
   } catch (e) {
     CONN = null; persist();
@@ -692,17 +706,17 @@ function renderNet() {
     for (const code in tot) { A += conv(tot[code].assets, code, D); B += conv(tot[code].bills, code, D); }
     const net = A - B;
     $('nw-body').innerHTML = `<div class="ov-grid">
-      <div class="ov-item wide"><div class="ov-lbl">Net worth (assets − bills)</div>
+      <div class="ov-item wide"><div class="ov-lbl">Net worth (assets − liabilities)</div>
         <div class="ov-val ${net<0?'red':''}">${money(net, D)}</div><div class="ov-sub">All currencies converted to ${esc(D)}</div></div>
-      <div class="ov-item"><div class="ov-lbl">Assets</div><div class="ov-val green">${fmtN(A, D)}</div><div class="ov-sub">${esc(D)}</div></div>
-      <div class="ov-item"><div class="ov-lbl">Card bills</div><div class="ov-val red">${fmtN(B, D)}</div><div class="ov-sub">${esc(D)} to pay</div></div>
+      <div class="ov-item"><div class="ov-lbl">Assets</div><div class="ov-val green">${fmtN(A, D)}</div><div class="ov-sub">${esc(D)} you have</div></div>
+      <div class="ov-item"><div class="ov-lbl">Liabilities</div><div class="ov-val red">${fmtN(B, D)}</div><div class="ov-sub">${esc(D)} owed on cards</div></div>
     </div>`;
   } else {
     const rows = S.currencies.filter(c => tot[c.code] && tot[c.code].n).map(c => {
       const g = tot[c.code], net = g.assets - g.bills;
       return `<tr><td>${esc(c.code)}</td><td class="green">${fmtN(g.assets,c.code)}</td><td class="${g.bills>0?'red':''}">${fmtN(g.bills,c.code)}</td><td class="${net<0?'red':''}">${fmtN(net,c.code)}</td></tr>`;
     }).join('');
-    $('nw-body').innerHTML = `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Currency</th><th>Assets</th><th>Bills</th><th>Net</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    $('nw-body').innerHTML = `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Currency</th><th>Assets</th><th>Liabilities</th><th>Net</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 }
 
@@ -723,7 +737,7 @@ function renderAccounts() {
         <div class="row-amt ${b<0?'red':''}">${fmtN(b, c.code)}</div></div>`;
     }).join('') + '</div>';
   });
-  $('acc-body').innerHTML = html || '<div class="muted">No accounts yet. Tap manage to add one.</div>';
+  $('acc-body').innerHTML = html || '<div class="muted">No assets yet. Tap manage to add a bank account, cash or e-wallet.</div>';
 }
 
 // ── RENDER: CARD BILLS ────────────────────────────────────────
@@ -747,14 +761,15 @@ function renderBills() {
       <div><div class="grp-sum red">${fmtN(sum, c.code)}</div>${c.code!==D?`<div class="grp-conv">≈ ${money(conv(sum,c.code,D),D)}</div>`:''}</div></div>`;
     html += cards.map(a => {
       const owed = -balance(a);
+      const left = a.limit > 0 ? ` · ${fmtN(a.limit - owed, c.code)} credit left` : '';
       return `<div class="row"><div class="row-ic">💳</div>
-        <div class="row-main"><div class="row-name">${esc(a.name)}</div><div class="row-sub">${owed>0?dueText(a.dueDay):'nothing to pay'}</div></div>
+        <div class="row-main"><div class="row-name">${esc(a.name)}</div><div class="row-sub">${owed>0?dueText(a.dueDay):'nothing to pay'}${left}</div></div>
         <div class="row-amt ${owed>0?'red':'green'}">${fmtN(owed, c.code)}</div>
         ${owed>0?`<button class="pay-btn" onclick="payCard('${a.id}')">Pay</button>`:''}</div>`;
     }).join('') + '</div>';
   });
-  if (!html) { $('bill-body').innerHTML = '<div class="muted">No credit cards yet.</div>'; return; }
-  html += `<div class="total-line"><span class="lbl">All bills in ${esc(D)}</span><span class="val red">${money(grand, D)}</span></div>`;
+  if (!html) { $('bill-body').innerHTML = '<div class="muted">No credit cards yet. Tap manage to add one.</div>'; return; }
+  html += `<div class="total-line"><span class="lbl">All liabilities in ${esc(D)}</span><span class="val red">${money(grand, D)}</span></div>`;
   $('bill-body').innerHTML = html;
 }
 function payCard(cardId) {
@@ -813,7 +828,7 @@ function setPlan(key, val) {
   renderPlan(); save();
 }
 function toggleAdjust() {
-  if (!usedCurs().length) { showToast('Add an account first (⚙ Settings → Accounts), then set its budgets', true); return; }
+  if (!usedCurs().length) { showToast('Add an asset or card first (⚙ Settings), then set budgets for its currency', true); return; }
   if (UI.planTab === 'saving') { UI.savEdit = !UI.savEdit; }
   else {
     UI.budgetEdit = !UI.budgetEdit;
@@ -1025,12 +1040,13 @@ function renderHistory() {
 // ── ENTRY SHEET ───────────────────────────────────────────────
 let ED = null;
 function accountOptions(selected, exclude) {
-  return S.currencies.map(c => {
-    const list = S.accounts.filter(a => a.currency === c.code && a.id !== exclude);
+  const group = (label, isCard) => S.currencies.map(c => {
+    const list = S.accounts.filter(a => a.currency === c.code && a.id !== exclude && (a.type === 'card') === isCard);
     if (!list.length) return '';
-    return `<optgroup label="${esc(c.code)}">` + list.map(a =>
+    return `<optgroup label="${label} · ${esc(c.code)}">` + list.map(a =>
       `<option value="${a.id}" ${a.id===selected?'selected':''}>${TYPES[a.type].icon} ${esc(a.name)} · ${esc(a.currency)}</option>`).join('') + '</optgroup>';
   }).join('');
+  return group('Assets', false) + group('Credit cards', true);
 }
 function openEntry(id, preset) {
   const t = id ? S.txs.find(x => x.id === id) : null;
@@ -1135,6 +1151,7 @@ function openSettings(section) {
 }
 function renderSettings() {
   const base = S.base;
+  const curOpts = sel => S.currencies.map(c => `<option ${sel===c.code?'selected':''}>${esc(c.code)}</option>`).join('');
   let h = '';
 
   // Google Sheet connection
@@ -1154,7 +1171,8 @@ function renderSettings() {
 
   // Currencies & rates
   h += `<div class="set-sec" id="sec-currencies"><div class="set-h">Currencies & rates</div>
-    <div class="set-note">Rates are set against ${esc(base)}: 1 ${esc(base)} = ? Each update starts from a date you pick. Entries before that date keep the old rate.</div>`;
+    <div class="inline-form"><label>Rates are set against <select class="text-inp" id="base-sel" onchange="setBase(this.value)">${curOpts(base)}</select></label></div>
+    <div class="set-note">Rates read as 1 ${esc(base)} = ? You can change the currency above any time: every rate is recalculated, so past entries keep their value. Each rate update starts from a date you pick, and entries before that date keep the old rate.</div>`;
   S.currencies.forEach(c => {
     const isBase = c.code === base, r = curRate(c.code);
     const inUse = S.accounts.some(a => a.currency === c.code);
@@ -1180,27 +1198,46 @@ function renderSettings() {
     <label>1 ${esc(base)} = <input class="inline-inp" type="number" step="any" id="nc-rate" placeholder="rate"></label>
     <button class="add-btn" onclick="addCur()">Add currency</button></div></div>`;
 
-  // Accounts
+  const delBtn = a => `<button class="del-x" onclick="delAcc('${a.id}')" aria-label="Remove ${esc(a.name)}">×</button>`;
+
+  // Assets: money you have
   const ea = UI.accEdit ? acc(UI.accEdit) : null;
-  h += `<div class="set-sec" id="sec-accounts"><div class="set-h">Accounts</div>
-    <div class="set-note">Each account holds one currency. For a credit card, enter what you owe as a positive number.</div>`;
+  h += `<div class="set-sec" id="sec-assets"><div class="set-h">Assets</div>
+    <div class="set-note">Money you have: bank accounts, cash, e-wallets and investments. Each one holds one currency.</div>`;
   S.currencies.forEach(c => {
-    S.accounts.filter(a => a.currency === c.code).forEach(a => {
+    S.accounts.filter(a => a.currency === c.code && a.type !== 'card').forEach(a => {
       h += `<div class="set-row"><div class="row-ic">${TYPES[a.type].icon}</div><div class="set-main"><div class="set-name">${esc(a.name)}</div>
-        <div class="set-sub">${esc(a.currency)} · ${TYPES[a.type].label}${a.type==='card'&&a.dueDay?' · due day '+a.dueDay:''} · now ${fmtN(balance(a), a.currency)}</div></div>
-        <button class="edit-btn" onclick="UI.accEdit='${a.id}';renderSettings();$('na-name').focus()">edit</button>
-        <button class="del-x" onclick="delAcc('${a.id}')" aria-label="Remove ${esc(a.name)}">×</button></div>`;
+        <div class="set-sub">${esc(a.currency)} · ${TYPES[a.type].label} · now ${fmtN(balance(a), a.currency)}</div></div>
+        <button class="edit-btn" onclick="UI.accEdit='${a.id}';renderSettings();$('na-name').focus()">edit</button>${delBtn(a)}</div>`;
     });
   });
-  const startVal = ea ? (ea.type === 'card' ? -ea.opening : ea.opening) : '';
   h += `<div class="inline-form">
-    <input class="text-inp" id="na-name" placeholder="Account name" value="${ea?esc(ea.name):''}" style="flex:1;min-width:120px">
-    <select class="text-inp" id="na-type">${Object.keys(TYPES).map(k=>`<option value="${k}" ${ea&&ea.type===k?'selected':''}>${TYPES[k].label}</option>`).join('')}</select>
-    <select class="text-inp" id="na-cur">${S.currencies.map(c=>`<option ${(ea?ea.currency:UI.disp)===c.code?'selected':''}>${esc(c.code)}</option>`).join('')}</select>
-    <label>Starting balance / owed <input class="inline-inp" type="number" step="any" id="na-open" value="${startVal}"></label>
-    <label>Card due day <input class="inline-inp" type="number" min="1" max="31" id="na-due" value="${ea&&ea.dueDay?ea.dueDay:''}" style="width:56px"></label>
-    <button class="add-btn" onclick="saveAcc()">${ea?'Save changes':'Add account'}</button>
+    <input class="text-inp" id="na-name" placeholder="e.g. DBS Savings" value="${ea?esc(ea.name):''}" style="flex:1;min-width:120px">
+    <select class="text-inp" id="na-type">${ASSET_TYPES.map(k=>`<option value="${k}" ${ea&&ea.type===k?'selected':''}>${TYPES[k].label}</option>`).join('')}</select>
+    <select class="text-inp" id="na-cur">${curOpts(ea ? ea.currency : UI.disp)}</select>
+    <label>Starting balance <input class="inline-inp" type="number" step="any" id="na-open" value="${ea ? ea.opening : ''}"></label>
+    <button class="add-btn" onclick="saveAcc()">${ea?'Save changes':'Add asset'}</button>
     ${ea?`<button class="edit-btn" onclick="UI.accEdit='';renderSettings()">cancel</button>`:''}</div></div>`;
+
+  // Liabilities: credit cards
+  const ec = UI.cardEdit ? acc(UI.cardEdit) : null;
+  h += `<div class="set-sec" id="sec-liabilities"><div class="set-h">Liabilities · credit cards</div>
+    <div class="set-note">Money you owe. Spending on a card adds to what you owe. Paying the bill from a bank account is a transfer, not spending.</div>`;
+  S.currencies.forEach(c => {
+    S.accounts.filter(a => a.currency === c.code && a.type === 'card').forEach(a => {
+      h += `<div class="set-row"><div class="row-ic">💳</div><div class="set-main"><div class="set-name">${esc(a.name)}</div>
+        <div class="set-sub">${esc(a.currency)} · owe ${fmtN(-balance(a), a.currency)}${a.limit ? ' · limit ' + fmtN(a.limit, a.currency) : ''}${a.dueDay ? ' · due day ' + a.dueDay : ''}</div></div>
+        <button class="edit-btn" onclick="UI.cardEdit='${a.id}';renderSettings();$('nk-name').focus()">edit</button>${delBtn(a)}</div>`;
+    });
+  });
+  h += `<div class="inline-form">
+    <input class="text-inp" id="nk-name" placeholder="e.g. Citi Rewards" value="${ec?esc(ec.name):''}" style="flex:1;min-width:120px">
+    <select class="text-inp" id="nk-cur">${curOpts(ec ? ec.currency : UI.disp)}</select>
+    <label>Owed at start <input class="inline-inp" type="number" step="any" min="0" id="nk-owed" value="${ec ? -ec.opening || '' : ''}" placeholder="0"></label>
+    <label>Credit limit <input class="inline-inp" type="number" step="any" min="0" id="nk-limit" value="${ec && ec.limit ? ec.limit : ''}" placeholder="optional"></label>
+    <label>Due day <input class="inline-inp" type="number" min="1" max="31" id="nk-due" value="${ec && ec.dueDay ? ec.dueDay : ''}" style="width:56px"></label>
+    <button class="add-btn" onclick="saveCard()">${ec?'Save changes':'Add card'}</button>
+    ${ec?`<button class="edit-btn" onclick="UI.cardEdit='';renderSettings()">cancel</button>`:''}</div></div>`;
 
   // Categories
   h += `<div class="set-sec" id="sec-categories"><div class="set-h">Categories</div>
@@ -1232,6 +1269,26 @@ function saveRate(code) {
   renderAll(); renderSettings();
   showToast(`${code} rate saved from ${date}. Earlier entries are unchanged.`);
 }
+// Re-expresses every rate against a new base currency. Rates are recalculated at every date on which
+// any rate changes, so every conversion (and every past entry) keeps exactly the same value.
+function setBase(nb) {
+  if (nb === S.base || !cur(nb)) return;
+  const dates = [...new Set(S.rates.map(r => r.date))].sort();
+  if (!dates.length) dates.push(todayISO());
+  const out = [];
+  S.currencies.forEach(c => {
+    if (c.code === nb) return;
+    let last = null;
+    dates.forEach(d => {
+      const v = +(rateOn(c.code, d) / rateOn(nb, d)).toPrecision(10);
+      if (v !== last) { out.push({code: c.code, date: d, rate: v}); last = v; }
+    });
+  });
+  S.rates = out; S.base = nb;
+  UI.rateForm = ''; UI.rateHist = '';
+  renderAll(); renderSettings();
+  showToast(`Rates now read as 1 ${nb} = ? Past entries keep their value.`);
+}
 function delRate(code, date) {
   S.rates = S.rates.filter(r => !(r.code === code && r.date === date));
   renderAll(); renderSettings(); showToast('Rate removed');
@@ -1256,13 +1313,25 @@ function delCur(code) {
 }
 function saveAcc() {
   const name = $('na-name').value.trim(), type = $('na-type').value, currency = $('na-cur').value;
-  const v = parseFloat($('na-open').value) || 0, due = parseInt($('na-due').value) || 0;
-  if (!name) { showToast('Enter an account name', true); return; }
-  const data = {name, type, currency, opening: type === 'card' ? -Math.abs(v) : v, dueDay: type === 'card' ? Math.min(Math.max(due,0),31) : 0};
+  const v = parseFloat($('na-open').value) || 0;
+  if (!name) { showToast('Enter a name for the asset', true); return; }
+  const data = {name, type, currency, opening: v, dueDay: 0, limit: 0};
   if (UI.accEdit) Object.assign(acc(UI.accEdit), data);
   else S.accounts.push(Object.assign({id: 'a_' + uid()}, data));
   const msg = (UI.accEdit ? 'Updated ' : 'Added ') + name;
   UI.accEdit = '';
+  renderAll(); renderSettings(); showToast(msg);
+}
+function saveCard() {
+  const name = $('nk-name').value.trim(), currency = $('nk-cur').value;
+  const owed = Math.abs(parseFloat($('nk-owed').value) || 0), limit = Math.abs(parseFloat($('nk-limit').value) || 0);
+  const due = Math.min(Math.max(parseInt($('nk-due').value) || 0, 0), 31);
+  if (!name) { showToast('Enter a name for the card', true); return; }
+  const data = {name, type: 'card', currency, opening: -owed, dueDay: due, limit};
+  if (UI.cardEdit) Object.assign(acc(UI.cardEdit), data);
+  else S.accounts.push(Object.assign({id: 'k_' + uid()}, data));
+  const msg = (UI.cardEdit ? 'Updated ' : 'Added ') + name;
+  UI.cardEdit = '';
   renderAll(); renderSettings(); showToast(msg);
 }
 function delAcc(id) {
