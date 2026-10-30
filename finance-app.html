@@ -502,7 +502,8 @@ function toTables(s) {
                                                               credit_limit:a.limit || 0, due_day:a.dueDay || 0})),
     Categories: s.categories.map(c => ({id:c.id, name:c.name, emoji:c.emoji, kind:c.kind, color:c.color})),
     Budgets: s.budgets.map(b => ({category_id:b.catId, currency:b.currency, monthly:b.monthly||0, yearly:b.yearly||0})),
-    SavingsTargets: s.savingsTargets.map(t => ({currency:t.currency, monthly:t.monthly||0, yearly:t.yearly||0})),
+    SavingsTargets: s.savingsTargets.map(t => ({currency:t.currency, monthly:t.monthly||0, yearly:t.yearly||0,
+                                                saved_before:t.before||0, saved_before_year:t.beforeYear||''})),
     Transactions: s.txs.map(t => ({id:t.id, date:t.date, type:t.type, account_id:t.accountId, amount:t.amount, category_id:t.catId||'',
                                    remark:t.remark||'', to_account_id:t.toAccountId||'', to_amount:t.toAmount||0})),
   };
@@ -525,7 +526,8 @@ function fromTables(d) {
     categories: t('Categories').filter(r => str(r.id)).map((r,i) => ({id:str(r.id), name:str(r.name) || str(r.id), emoji:str(r.emoji) || '📦',
                                                                      kind: str(r.kind) === 'income' ? 'income' : 'expense', color:str(r.color) || PALETTE[i % PALETTE.length]})),
     budgets: t('Budgets').filter(r => str(r.category_id) && str(r.currency)).map(r => ({catId:str(r.category_id), currency:str(r.currency), monthly:num(r.monthly), yearly:num(r.yearly)})),
-    savingsTargets: t('SavingsTargets').filter(r => str(r.currency)).map(r => ({currency:str(r.currency), monthly:num(r.monthly), yearly:num(r.yearly)})),
+    savingsTargets: t('SavingsTargets').filter(r => str(r.currency)).map(r => ({currency:str(r.currency), monthly:num(r.monthly), yearly:num(r.yearly),
+                                                                               before:num(r.saved_before), beforeYear:str(r.saved_before_year)})),
     txs: t('Transactions').filter(r => str(r.id) && str(r.date)).map(r => ({id:str(r.id), date:str(r.date).slice(0,10),
           type: ['expense','income','transfer'].includes(str(r.type)) ? str(r.type) : 'expense', accountId:str(r.account_id), amount:num(r.amount),
           catId:str(r.category_id), remark:str(r.remark), toAccountId:str(r.to_account_id), toAmount:num(r.to_amount)})),
@@ -809,7 +811,7 @@ function budTotals(scope, period) {
 function savTotals(scope, period) {
   const D = UI.disp;
   const txs = periodTxs(period).filter(t => t.type !== 'transfer' && (scope === 'ALL' || accCur(t.accountId) === scope));
-  const saved = txs.reduce((s,t) => {
+  let saved = txs.reduce((s,t) => {
     const v = scope === 'ALL' ? conv(t.amount, accCur(t.accountId), D, t.date) : t.amount;
     return s + (t.type === 'income' ? v : -v);
   }, 0);
@@ -818,6 +820,9 @@ function savTotals(scope, period) {
     if (scope !== 'ALL' && st.currency !== scope) return;
     const v = period === 'month' ? st.monthly : yearAmt(st.monthly, st.yearly);
     target += scope === 'ALL' ? conv(v, st.currency, D) : v;
+    // Saving done before the app was used counts toward its own year only.
+    if (period === 'year' && st.before && st.beforeYear === UI.month.slice(0,4))
+      saved += scope === 'ALL' ? conv(st.before, st.currency, D) : st.before;
   });
   return {saved, target};
 }
@@ -959,33 +964,47 @@ function renderSavingTab() {
   const rows = [{label: `All<span>in ${esc(D)}</span>`, strong: true, month: savCell('ALL','month'), year: savCell('ALL','year')}]
     .concat(curs.map(cc => ({label: esc(cc), month: savCell(cc,'month'), year: savCell(cc,'year')})));
   let h = planHead('Saving to go', UI.savEdit) + summaryGrid(rows);
-  h += `<div class="hint">Saved = income − expenses in that currency. Transfers and exchanges between your own accounts don't count. Yearly target = the yearly amount, or monthly × 12 if left blank.</div>`;
+  h += `<div class="hint">Saved = income − expenses in that currency. Transfers and exchanges between your own accounts don't count. "This year" also adds what you entered as saved before the app. Yearly target = the yearly amount, or monthly × 12 if left blank.</div>`;
 
   h += UI.savEdit
     ? `<div class="detail-h" id="adjust-panel"><span class="sec-t">Adjust targets</span><button class="add-btn" onclick="toggleAdjust()">Done</button></div>`
     : `<div class="detail-h"><span class="sec-t">Targets</span></div>`;
   if (UI.savEdit) {
-    h += `<div class="cat-row" style="font-family:var(--font-mono);font-size:10px;color:var(--text3);letter-spacing:.06em"><div class="cat-name"></div><div style="width:96px;text-align:right">MONTHLY</div><div style="width:96px;text-align:right">YEARLY</div></div>`;
+    const yr = UI.month.slice(0,4), w = 'width:84px';
+    h += `<div class="cat-row" style="font-family:var(--font-mono);font-size:10px;color:var(--text3);letter-spacing:.06em;align-items:flex-end"><div class="cat-name"></div>
+      <div style="${w};text-align:right">MONTHLY</div><div style="${w};text-align:right">YEARLY</div><div style="${w};text-align:right">SAVED BEFORE APP (${yr})</div></div>`;
     h += usedCurs().map(cc => {
       const st = S.savingsTargets.find(s => s.currency === cc) || {monthly:0, yearly:0};
+      const before = st.beforeYear === yr && st.before ? st.before : '';
       return `<div class="cat-row"><div class="cat-name mono">${esc(cc)}</div>
-        <input class="inline-inp" type="number" step="any" value="${st.monthly||''}" placeholder="0" aria-label="${esc(cc)} monthly target" onchange="setTarget('${cc}','monthly',this.value)">
-        <input class="inline-inp" type="number" step="any" value="${st.yearly||''}" placeholder="${st.monthly?'auto '+st.monthly*12:'auto'}" aria-label="${esc(cc)} yearly target" onchange="setTarget('${cc}','yearly',this.value)"></div>`;
+        <input class="inline-inp" style="${w}" type="number" step="any" value="${st.monthly||''}" placeholder="0" aria-label="${esc(cc)} monthly target" onchange="setTarget('${cc}','monthly',this.value)">
+        <input class="inline-inp" style="${w}" type="number" step="any" value="${st.yearly||''}" placeholder="${st.monthly?'auto '+st.monthly*12:'auto'}" aria-label="${esc(cc)} yearly target" onchange="setTarget('${cc}','yearly',this.value)">
+        <input class="inline-inp" style="${w}" type="number" step="any" value="${before}" placeholder="0" aria-label="${esc(cc)} saved before using the app in ${yr}" onchange="setTarget('${cc}','before',this.value)"></div>`;
     }).join('');
+    h += `<div class="hint">"Saved before app" is what you already saved in ${yr} before you started logging here. It counts toward this year only.</div>`;
   } else {
     const list = S.savingsTargets.filter(st => cur(st.currency));
-    h += list.map(st => `<div class="tgt-row"><span>${esc(st.currency)}</span><span>${fmtN(st.monthly, st.currency)} / month · ${fmtN(yearAmt(st.monthly, st.yearly), st.currency)} / year</span></div>`).join('')
+    const yr = UI.month.slice(0,4);
+    h += list.map(st => `<div class="tgt-row"><span>${esc(st.currency)}</span><span>${fmtN(st.monthly, st.currency)} / month · ${fmtN(yearAmt(st.monthly, st.yearly), st.currency)} / year${
+      st.before && st.beforeYear === yr ? ` · ${fmtN(st.before, st.currency)} saved before app` : ''}</span></div>`).join('')
       || '<div class="muted" style="padding:8px 0">No targets yet. Tap adjust to set one per currency.</div>';
   }
   $('plan-body').innerHTML = h;
 }
 function setTarget(code, field, val) {
   let st = S.savingsTargets.find(s => s.currency === code);
-  if (!st) { st = {currency: code, monthly: 0, yearly: 0}; S.savingsTargets.push(st); }
-  st[field] = Math.max(0, parseFloat(val) || 0);
-  if (!st.monthly && !st.yearly) S.savingsTargets = S.savingsTargets.filter(x => x !== st);
+  if (!st) { st = {currency: code, monthly: 0, yearly: 0, before: 0, beforeYear: ''}; S.savingsTargets.push(st); }
+  if (field === 'before') {
+    // can be negative if more was spent than earned before the app
+    st.before = parseFloat(val) || 0;
+    st.beforeYear = st.before ? UI.month.slice(0,4) : '';
+  } else {
+    st[field] = Math.max(0, parseFloat(val) || 0);
+  }
+  if (!st.monthly && !st.yearly && !st.before) S.savingsTargets = S.savingsTargets.filter(x => x !== st);
   renderPlan(); save();
-  showToast(`${code} ${field} target: ${money(st[field], code)}`);
+  showToast(field === 'before' ? `${code} saved before app in ${UI.month.slice(0,4)}: ${money(st.before, code)}`
+                               : `${code} ${field} target: ${money(st[field], code)}`);
 }
 
 // ── RENDER: HISTORY ───────────────────────────────────────────
