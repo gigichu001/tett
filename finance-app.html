@@ -675,6 +675,8 @@ function totalsByCur() {
     g.n++;
     if (a.type === 'card') g.bills += -b; else g.assets += b;
   });
+  // Cards in a currency are netted; a net credit in your favour counts as an asset, not a negative liability.
+  Object.values(t).forEach(g => { if (g.bills < 0) { g.assets += -g.bills; g.bills = 0; } });
   return t;
 }
 const monthTxs = () => S.txs.filter(t => t.date.slice(0,7) === UI.month);
@@ -751,6 +753,13 @@ function dueText(day) {
   const days = Math.round((due - now) / 86400000);
   return `due ${due.getDate()} ${MONTHS[due.getMonth()]} · ${days===0?'today':days===1?'tomorrow':'in '+days+' days'}`;
 }
+// Amount owed on cards: red when you owe, green with "+" when it is in your favour.
+function owedView(amt, code, withCode) {
+  const n = v => withCode ? money(v, code) : fmtN(v, code);
+  if (amt > 0.005) return {cls: 'red', txt: n(amt)};
+  if (amt < -0.005) return {cls: 'green', txt: '+' + n(-amt)};
+  return {cls: 'green', txt: n(0)};
+}
 function renderBills() {
   const D = UI.disp;
   let html = '', grand = 0;
@@ -760,18 +769,19 @@ function renderBills() {
     const sum = cards.reduce((s,a) => s - balance(a), 0);
     grand += conv(sum, c.code, D);
     html += `<div class="grp"><div class="grp-h"><span class="grp-code">${esc(c.code)} bills</span>
-      <div><div class="grp-sum red">${fmtN(sum, c.code)}</div>${c.code!==D?`<div class="grp-conv">≈ ${money(conv(sum,c.code,D),D)}</div>`:''}</div></div>`;
+      <div><div class="grp-sum ${owedView(sum, c.code).cls}">${owedView(sum, c.code).txt}</div>${c.code!==D?`<div class="grp-conv">≈ ${owedView(conv(sum,c.code,D), D, true).txt}</div>`:''}</div></div>`;
     html += cards.map(a => {
-      const owed = -balance(a);
+      const owed = -balance(a), v = owedView(owed, c.code);
       const left = a.limit > 0 ? ` · ${fmtN(a.limit - owed, c.code)} credit left` : '';
+      const sub = owed > 0.005 ? dueText(a.dueDay) : owed < -0.005 ? 'in your favour' : 'nothing to pay';
       return `<div class="row"><div class="row-ic">💳</div>
-        <div class="row-main"><div class="row-name">${esc(a.name)}</div><div class="row-sub">${owed>0?dueText(a.dueDay):'nothing to pay'}${left}</div></div>
-        <div class="row-amt ${owed>0?'red':'green'}">${fmtN(owed, c.code)}</div>
+        <div class="row-main"><div class="row-name">${esc(a.name)}</div><div class="row-sub">${sub}${left}</div></div>
+        <div class="row-amt ${v.cls}">${v.txt}</div>
         ${owed>0?`<button class="pay-btn" onclick="payCard('${a.id}')">Pay</button>`:''}</div>`;
     }).join('') + '</div>';
   });
   if (!html) { $('bill-body').innerHTML = '<div class="muted">No credit cards yet. Tap manage to add one.</div>'; return; }
-  html += `<div class="total-line"><span class="lbl">All liabilities in ${esc(D)}</span><span class="val red">${money(grand, D)}</span></div>`;
+  html += `<div class="total-line"><span class="lbl">All liabilities in ${esc(D)}</span><span class="val ${owedView(grand, D).cls}">${owedView(grand, D, true).txt}</span></div>`;
   $('bill-body').innerHTML = html;
 }
 function payCard(cardId) {
